@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prompt Guide</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5; }
+    button, textarea, select, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--cp-link); }
+    :focus-visible { outline: 3px solid var(--cp-accent); outline-offset: 3px; }
+    .skip-link { position: fixed; left: 1rem; top: -5rem; z-index: 100; padding: .7rem 1rem; background: var(--cp-text); color: var(--cp-bg); border-radius: .625rem; }
+    .skip-link:focus { top: 1rem; }
+    .topbar { position: sticky; top: 0; z-index: 20; background: var(--cp-panel-strong); border-bottom: 1px solid var(--cp-border); backdrop-filter: blur(12px); }
+    .nav { width: min(1180px, calc(100% - 2rem)); min-height: 4rem; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: .65rem; color: var(--cp-text); font-weight: 800; text-decoration: none; }
+    .brand-mark { width: 2.25rem; height: 2.25rem; display: grid; place-items: center; background: var(--cp-accent); color: var(--cp-accent-fg); border-radius: .625rem; }
+    .nav-links { display: flex; align-items: center; gap: .35rem; }
+    .nav-links a { padding: .5rem .7rem; color: var(--cp-text-muted); text-decoration: none; font-weight: 650; border-radius: .625rem; }
+    .nav-links a:hover { background: var(--cp-accent-soft); color: var(--cp-text); }
+    .privacy-chip { display: inline-flex; gap: .4rem; align-items: center; color: var(--cp-success); font-size: .84rem; font-weight: 750; }
+    .privacy-chip::before { content: ""; width: .55rem; height: .55rem; background: var(--cp-success); border-radius: 50%; }
+    main { min-height: 80vh; }
+    .wrap { width: min(1180px, calc(100% - 2rem)); margin: auto; }
+    .lab-section { padding: 2rem 0 3.5rem; }
+    .mission-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+    .eyebrow { margin: 0 0 .35rem; color: var(--cp-accent); font-size: .76rem; font-weight: 850; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: .4rem; font-size: clamp(1.8rem, 4vw, 3.15rem); line-height: 1.05; }
+    .mission-copy { max-width: 68ch; margin-bottom: 0; color: var(--cp-text-muted); }
+    .mission-progress { min-width: 12rem; }
+    .progress-label { display: flex; justify-content: space-between; gap: .5rem; color: var(--cp-text-muted); font-size: .82rem; }
+    progress { width: 100%; height: .55rem; accent-color: var(--cp-accent); }
+    .mode-tabs { display: flex; gap: .35rem; padding: .35rem; margin-bottom: 1rem; overflow-x: auto; background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: .625rem; }
+    .mode-tab { min-height: 2.75rem; padding: .55rem .9rem; border: 0; border-radius: .625rem; background: transparent; color: var(--cp-text-muted); white-space: nowrap; font-weight: 750; }
+    .mode-tab[aria-selected="true"] { background: var(--cp-surface); color: var(--cp-accent); box-shadow: 0 1px 2px var(--cp-border); }
+    .lab-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(19rem, .75fr); gap: 1rem; align-items: start; }
+    .panel { min-width: 0; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border); }
+    .panel-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; padding: 1rem 1rem .8rem; border-bottom: 1px solid var(--cp-border); }
+    .panel-head > * { min-width: 0; }
+    .panel-head select { max-width: 100%; }
+    .panel-head h2, .panel-head h3 { margin-bottom: .25rem; font-size: 1.05rem; }
+    .panel-head p { margin: 0; color: var(--cp-text-muted); font-size: .86rem; }
+    .editor-body { padding: 1rem; }
+    .brief { padding: .8rem; margin-bottom: .8rem; border-left: 4px solid var(--cp-accent); background: var(--cp-accent-soft); border-radius: 0 .625rem .625rem 0; }
+    .brief strong { display: block; margin-bottom: .2rem; }
+    textarea { width: 100%; min-height: 18rem; resize: vertical; padding: 1rem; border: 1px solid var(--cp-border-strong); border-radius: .625rem; background: var(--cp-bg-elevated); color: var(--cp-text); font-family: Consolas, "Courier New", Courier, monospace; line-height: 1.55; }
+    textarea::placeholder { color: var(--cp-text-soft); }
+    .editor-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-top: .55rem; color: var(--cp-text-muted); font-size: .8rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .85rem; }
+    .btn { min-height: 2.75rem; padding: .55rem .9rem; border: 1px solid var(--cp-accent); border-radius: .625rem; background: var(--cp-accent); color: var(--cp-accent-fg); font-weight: 800; }
+    .btn:hover { background: var(--cp-accent-hover); }
+    .btn.secondary { background: var(--cp-surface); color: var(--cp-accent); }
+    .btn.quiet { border-color: var(--cp-border); background: var(--cp-surface-soft); color: var(--cp-text); }
+    .file-btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .score-strip { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; padding: 1rem; }
+    .score-box { padding: .8rem; background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: .625rem; }
+    .score-label { display: flex; justify-content: space-between; color: var(--cp-text-muted); font-size: .78rem; font-weight: 750; }
+    .score-value { margin: .1rem 0 .25rem; font-size: 1.75rem; line-height: 1; font-weight: 900; }
+    .meter { height: .45rem; overflow: hidden; background: var(--cp-border); border-radius: .625rem; }
+    .meter > span { display: block; width: 0; height: 100%; background: var(--cp-accent); transition: width .25s ease; }
+    .blueprint { padding: 0 1rem 1rem; }
+    .dimension { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) auto; align-items: center; gap: .6rem; min-height: 2.35rem; border-top: 1px solid var(--cp-border); font-size: .82rem; }
+    .dimension:first-child { border-top: 0; }
+    .dimension-name { font-weight: 750; }
+    .dimension-status { color: var(--cp-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .status-mark { width: 1.4rem; height: 1.4rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--cp-border-strong); font-size: .72rem; font-weight: 900; }
+    .status-mark.good { border-color: var(--cp-success); color: var(--cp-success); }
+    .status-mark.warn { border-color: var(--cp-border-strong); color: var(--cp-text); }
+    .findings { padding: 0 1rem 1rem; }
+    .finding { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .65rem; padding: .7rem 0; border: 0; border-top: 1px solid var(--cp-border); background: transparent; color: var(--cp-text); text-align: left; }
+    .finding:first-child { border-top: 0; }
+    .finding:hover .finding-title { color: var(--cp-accent); }
+    .finding-icon { width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: .4rem; background: var(--cp-accent-soft); color: var(--cp-accent); font-weight: 900; }
+    .finding-title { display: block; font-weight: 800; }
+    .finding-detail { display: block; margin-top: .12rem; color: var(--cp-text-muted); font-size: .8rem; }
+    .empty { padding: 1rem; color: var(--cp-text-muted); text-align: center; }
+    .xray { margin-top: 1rem; }
+    .xray-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; padding: 1rem; }
+    .xray-line { padding: .7rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-bg-elevated); }
+    .xray-line b { display: block; margin-bottom: .25rem; color: var(--cp-accent); font-size: .72rem; text-transform: uppercase; }
+    .xray-line p { margin: 0; font-family: Consolas, "Courier New", Courier, monospace; font-size: .82rem; overflow-wrap: anywhere; }
+    .cost-panel { margin-top: 1rem; }
+    .catalog-status { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1rem; padding: .7rem 1rem; border-bottom: 1px solid var(--cp-border); background: var(--cp-accent-soft); color: var(--cp-text-muted); font-size: .8rem; }
+    .catalog-status strong { color: var(--cp-text); }
+    .cost-controls { min-width: 0; padding: 1rem; border-bottom: 1px solid var(--cp-border); }
+    .model-selectors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin-bottom: 1rem; }
+    .cost-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+    .cost-field { min-width: 0; }
+    .cost-field label, .cost-legend { display: block; margin-bottom: .3rem; color: var(--cp-text-muted); font-size: .78rem; font-weight: 750; }
+    .cost-field input, .cost-field select { width: 100%; min-height: 2.75rem; padding: .55rem .65rem; border: 1px solid var(--cp-border-strong); border-radius: .625rem; background: var(--cp-surface); color: var(--cp-text); }
+    .cost-field small { display: block; margin-top: .25rem; color: var(--cp-text-soft); font-size: .72rem; }
+    .cost-presets { grid-column: 1 / -1; }
+    .preset-group { display: flex; gap: .35rem; padding: .25rem; background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: .625rem; overflow-x: auto; }
+    .preset-btn { flex: 1 0 auto; min-height: 2.5rem; padding: .45rem .7rem; border: 0; border-radius: .5rem; background: transparent; color: var(--cp-text-muted); font-weight: 750; }
+    .preset-btn[aria-pressed="true"] { background: var(--cp-surface); color: var(--cp-accent); box-shadow: 0 1px 2px var(--cp-border); }
+    .custom-profile { grid-column: 1 / -1; padding: .8rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-bg-elevated); }
+    .custom-profile h3 { margin: 0 0 .7rem; font-size: .9rem; }
+    .pricing-basis { margin: 0; padding: .7rem 1rem; border-bottom: 1px solid var(--cp-border); background: var(--cp-bg-elevated); color: var(--cp-text-muted); font-size: .78rem; }
+    .pricing-basis strong { color: var(--cp-text); }
+    .comparison-wrap { min-width: 0; overflow-x: auto; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .comparison-table th, .comparison-table td { padding: .7rem .65rem; border-bottom: 1px solid var(--cp-border); text-align: right; vertical-align: top; }
+    .comparison-table th { color: var(--cp-text-muted); background: var(--cp-bg-elevated); font-weight: 800; white-space: nowrap; }
+    .comparison-table th:first-child, .comparison-table td:first-child { min-width: 15rem; text-align: left; }
+    .model-name { display: block; color: var(--cp-text); font-size: .88rem; font-weight: 850; }
+    .model-meta, .model-caveat { display: block; margin-top: .18rem; color: var(--cp-text-muted); font-size: .72rem; }
+    .lowest-label { display: inline-block; margin-top: .35rem; padding: .15rem .4rem; border: 1px solid var(--cp-success); border-radius: .4rem; color: var(--cp-text); font-size: .68rem; font-weight: 850; }
+    .comparison-cards { display: none; }
+    .comparison-card { padding: 1rem; border-bottom: 1px solid var(--cp-border); }
+    .comparison-card dl { margin: .7rem 0 0; }
+    .cost-row { display: flex; justify-content: space-between; gap: 1rem; padding: .35rem 0; color: var(--cp-text-muted); font-size: .8rem; }
+    .cost-row dt, .cost-row dd { margin: 0; }
+    .cost-row dd { color: var(--cp-text); font-weight: 750; text-align: right; }
+    .cost-note { margin: 0; padding: .85rem 1rem; color: var(--cp-text-muted); font-size: .78rem; }
+    .cost-note + .cost-note { padding-top: 0; }
+    .section { padding: 4rem 0; border-top: 1px solid var(--cp-border); }
+    .section.alt { background: var(--cp-bg-elevated); }
+    .section-head { max-width: 48rem; margin-bottom: 1.5rem; }
+    .section-head h2 { margin-bottom: .45rem; font-size: clamp(1.55rem, 3vw, 2.4rem); }
+    .section-head p { color: var(--cp-text-muted); }
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card { padding: 1.1rem; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border); }
+    .card-num { color: var(--cp-accent); font-size: .75rem; font-weight: 900; }
+    .card h3 { margin: .35rem 0; font-size: 1.05rem; }
+    .card p { margin-bottom: .8rem; color: var(--cp-text-muted); font-size: .9rem; }
+    .inline-btn { padding: 0; border: 0; background: transparent; color: var(--cp-link); font-weight: 750; }
+    .choice-bank { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; }
+    .choice { min-height: 2.75rem; padding: .5rem .7rem; border: 1px solid var(--cp-border-strong); border-radius: .625rem; background: var(--cp-surface); color: var(--cp-text); text-align: left; }
+    .choice[aria-pressed="true"] { border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-accent); }
+    .prediction-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: .7rem; }
+    .prediction-option { display: flex; gap: .55rem; align-items: start; min-height: 3rem; padding: .65rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); }
+    .prediction-option input { width: 1.1rem; height: 1.1rem; margin-top: .12rem; accent-color: var(--cp-accent); }
+    .result-note { padding: .75rem; margin-top: .75rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface-soft); }
+    .result-note strong { color: var(--cp-accent); }
+    .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    details { padding: .85rem 1rem; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: .625rem; }
+    details + details { margin-top: .6rem; }
+    summary { cursor: pointer; font-weight: 800; }
+    details p { margin: .65rem 0 0; color: var(--cp-text-muted); }
+    footer { padding: 2rem 0; border-top: 1px solid var(--cp-border); color: var(--cp-text-muted); font-size: .85rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      .lab-grid, .method-grid { grid-template-columns: 1fr; }
+      .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mission-bar { grid-template-columns: 1fr; }
+      .mission-progress { max-width: 20rem; }
+      .model-selectors, .cost-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .nav { width: min(100% - 1rem, 1180px); }
+      .nav-links a:not(.privacy-chip) { display: none; }
+      .wrap { width: min(100% - 1rem, 1180px); }
+      .lab-section { padding-top: 1.25rem; }
+      .score-strip, .xray-body, .card-grid, .prediction-grid, .model-selectors, .cost-fields { grid-template-columns: 1fr; }
+      .cost-presets { grid-column: auto; }
+      .custom-profile { grid-column: auto; }
+      .comparison-wrap { display: none; }
+      .comparison-cards { display: block; }
+      .dimension { grid-template-columns: 6.5rem minmax(0, 1fr) auto; }
+      .panel-head { flex-direction: column; }
+      .panel-head select { width: 100%; }
+      textarea { min-height: 16rem; }
+      .section { padding: 3rem 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to Prompt Lab</a>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#main"><span class="brand-mark">PG</span><span>Prompt Guide</span></a>
+      <div class="nav-links">
+        <a href="#lab">Lab</a><a href="#field-guide">Field guide</a><a href="#method">Method</a>
+        <span class="privacy-chip">Offline</span>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="lab-section" id="lab" aria-labelledby="lab-title">
+      <div class="wrap">
+        <div class="mission-bar">
+          <div>
+            <p class="eyebrow" id="mission-kicker">Mission 1 · Repair</p>
+            <h1 id="lab-title">Make the task testable.</h1>
+            <p class="mission-copy"><strong>A model-agnostic prompt literacy coach, using Microsoft&rsquo;s prompt framework as its foundation and coding-oriented extensions for constraints and verification.</strong></p>
+            <p class="mission-copy" id="mission-copy">Improve a vague Copilot request without making it unnecessarily long. The coach reads patterns locally; no prompt leaves this page.</p>
+          </div>
+          <div class="mission-progress">
+            <div class="progress-label"><span>Journey progress</span><span id="progress-text">0 / 12</span></div>
+            <progress id="journey-progress" max="12" value="0">0 of 12</progress>
+          </div>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Practice mode">
+          <button class="mode-tab" type="button" role="tab" aria-selected="true" data-mode="repair">Repair</button>
+          <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="build">Build</button>
+          <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="predict">Predict</button>
+          <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="sandbox">Sandbox</button>
+        </div>
+
+        <div class="lab-grid">
+          <section class="panel" aria-labelledby="workspace-title">
+            <header class="panel-head">
+              <div><h2 id="workspace-title">Prompt workspace</h2><p id="workspace-subtitle">Repair the request. There is no single correct wording.</p></div>
+              <select id="mission-select" aria-label="Choose mission"></select>
+            </header>
+            <div class="editor-body">
+              <div class="brief" id="brief"><strong>Brief</strong><span id="brief-text">A checkout test fails after a small refactor. Ask Copilot to fix it safely.</span></div>
+              <label class="sr-only" for="prompt-input">Your prompt</label>
+              <textarea id="prompt-input" spellcheck="true"></textarea>
+              <div class="editor-meta"><span id="word-count">0 words · ~0 estimated tokens</span><span id="save-state">Saved on this device</span></div>
+              <div class="actions">
+                <button class="btn" id="check-btn" type="button">Check my reasoning</button>
+                <button class="btn secondary" id="hint-btn" type="button">Reveal a hint</button>
+                <button class="btn quiet" id="reset-draft-btn" type="button">Reset draft</button>
+              </div>
+              <div id="hint-box" class="brief" hidden aria-live="polite"></div>
+            </div>
+          </section>
+
+          <aside class="panel" aria-labelledby="coach-title">
+            <header class="panel-head"><div><h2 id="coach-title">Blueprint coach</h2><p id="confidence-text">Transparent signals, not an AI judgment</p></div></header>
+            <div class="score-strip">
+              <div class="score-box"><div class="score-label"><span>Readiness</span><span id="readiness-band">Starting</span></div><div class="score-value" id="readiness-score">0</div><div class="meter"><span id="readiness-meter"></span></div></div>
+              <div class="score-box"><div class="score-label"><span>Efficiency</span><span id="efficiency-band">Starting</span></div><div class="score-value" id="efficiency-score">0</div><div class="meter"><span id="efficiency-meter"></span></div></div>
+            </div>
+            <div class="blueprint" id="blueprint" aria-label="Prompt blueprint dimensions"></div>
+            <div class="findings" id="findings" aria-live="polite"></div>
+          </aside>
+        </div>
+
+        <section class="panel xray" aria-labelledby="xray-title">
+          <header class="panel-head"><div><h2 id="xray-title">Prompt X-Ray</h2><p>See which sentences carry useful intent and which create risk.</p></div></header>
+          <div class="xray-body" id="xray-lines"></div>
+        </section>
+
+        <section class="panel cost-panel" id="cost-comparison" aria-labelledby="cost-title">
+          <header class="panel-head"><div><h2 id="cost-title">Model cost comparison</h2><p>Compare the same estimated text workload across explicitly named API platform SKUs.</p></div></header>
+          <div class="catalog-status"><span><strong>Curated API pricing snapshot</strong> · official sources verified <span id="catalog-date">2026-07-14</span></span><span id="catalog-warning">Standard Global text inference · USD per 1M tokens</span></div>
+          <div class="cost-controls">
+            <div class="model-selectors" id="model-selectors" aria-label="Models to compare"></div>
+            <div class="cost-fields">
+              <div class="cost-field"><label for="context-tokens">Additional context tokens</label><input id="context-tokens" data-workload-setting="contextTokens" type="number" min="0" max="1000000" step="1" inputmode="numeric" aria-describedby="context-tokens-help comparison-note"><small id="context-tokens-help">Files, system instructions, or retrieved context. Model limits vary.</small></div>
+              <div class="cost-field"><label for="cached-percent">Cached portion of input (%)</label><input id="cached-percent" data-workload-setting="cachedPercent" type="number" min="0" max="100" step="1" inputmode="decimal"><small>Defaults to 0 for comparable standard pricing</small></div>
+              <div class="cost-field"><label for="runs">Number of runs</label><input id="runs" data-workload-setting="runs" type="number" min="1" max="1000000" step="1" inputmode="numeric"><small>Calls, retries, or repeated use</small></div>
+              <div class="cost-presets"><span class="cost-legend" id="output-preset-label">Expected output size</span><div class="preset-group" role="group" aria-labelledby="output-preset-label"><button class="preset-btn" type="button" data-output-preset="short" aria-pressed="false">Short · 300</button><button class="preset-btn" type="button" data-output-preset="medium" aria-pressed="true">Medium · 1,000</button><button class="preset-btn" type="button" data-output-preset="long" aria-pressed="false">Long · 2,500</button><button class="preset-btn" type="button" data-output-preset="custom" aria-pressed="false">Custom</button></div></div>
+              <div class="cost-field"><label for="output-tokens">Expected billable output tokens</label><input id="output-tokens" data-workload-setting="outputTokens" type="number" min="0" max="1000000" step="1" inputmode="numeric" aria-describedby="output-tokens-help comparison-note"><small id="output-tokens-help">For reasoning models, include hidden reasoning tokens as well as the visible answer.</small></div>
+              <section class="custom-profile" id="custom-profile" aria-labelledby="custom-profile-title" hidden><h3 id="custom-profile-title">Custom rate profile</h3><div class="cost-fields"><div class="cost-field"><label for="custom-label">Profile name</label><input id="custom-label" data-custom-setting="label" type="text" maxlength="50"></div><div class="cost-field"><label for="custom-input-rate">Input / 1M ($)</label><input id="custom-input-rate" data-custom-setting="inputRate" type="number" min="0" step="0.01"></div><div class="cost-field"><label for="custom-cached-rate">Cached input / 1M ($)</label><input id="custom-cached-rate" data-custom-setting="cachedInputRate" type="number" min="0" step="0.01"></div><div class="cost-field"><label for="custom-output-rate">Output / 1M ($)</label><input id="custom-output-rate" data-custom-setting="outputRate" type="number" min="0" step="0.01"></div></div></section>
+            </div>
+          </div>
+          <p class="pricing-basis"><strong>Published rates are USD per 1 million tokens.</strong> Prompt tokens are a provider-independent browser estimate; actual billed usage depends on the selected model and provider. Costs use your prompt, context, expected billable output, and number of runs.</p>
+          <div class="comparison-wrap"><table class="comparison-table"><thead><tr><th scope="col">Model and API SKU</th><th scope="col">Input rate<br>(USD / 1M tokens)</th><th scope="col">Cached input rate<br>(USD / 1M tokens)</th><th scope="col">Output rate<br>(USD / 1M tokens)</th><th scope="col">Estimated input<br>cost / call</th><th scope="col">Estimated output<br>cost / call</th><th scope="col">Estimated total<br>per call</th><th scope="col">Projected total<br>all runs</th></tr></thead><tbody id="comparison-body"></tbody></table></div>
+          <div class="comparison-cards" id="comparison-cards"></div>
+          <p class="cost-note" id="comparison-note">Prompt estimate: 0 tokens. Select models and workload assumptions to compare.</p>
+          <p class="cost-note">API inference estimate only, not a quote or billing reconciliation. The snapshot includes only SKUs with a verified comparable public rate; documented models without one are intentionally omitted. GitHub Copilot, ChatGPT, and Claude subscriptions use different licensing or credit systems. Enterprise agreements, taxes, currency conversion, tools, media, grounding, batch, priority, regional, provisioned, and unmodeled long-context charges are excluded.</p>
+          <p class="sr-only" id="cost-live" aria-live="polite" aria-atomic="true"></p>
+        </section>
+        <p class="sr-only" id="live-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="section alt" id="field-guide" aria-labelledby="guide-title">
+      <div class="wrap">
+        <header class="section-head"><p class="eyebrow">Microsoft foundation + coding extensions</p><h2 id="guide-title">Give every sentence a job.</h2><p>Start with the Goal, Context, Source, and Expectations components described in <a href="https://support.microsoft.com/en-us/topic/learn-about-copilot-prompts-f6c3b467-f07c-4db1-ae54-ffac96184dd5" target="_blank" rel="noopener noreferrer">Microsoft&rsquo;s Copilot prompt guidance</a>. A clear goal is the minimum; use the other components when they improve the request. For coding work, this lab adds Constraints and Verification so scope and completion are explicit.</p></header>
+        <div class="card-grid" id="guide-cards"></div>
+      </div>
+    </section>
+
+    <section class="section" id="method" aria-labelledby="method-title">
+      <div class="wrap">
+        <header class="section-head"><p class="eyebrow">Inspect the coach</p><h2 id="method-title">Nothing hidden behind the score.</h2><p>The coach uses repeatable browser-side rules. It cannot understand your repository or guarantee that an answer will be correct.</p></header>
+        <div class="method-grid">
+          <div>
+            <details open><summary>Where this framework comes from</summary><p><a href="https://support.microsoft.com/en-us/topic/learn-about-copilot-prompts-f6c3b467-f07c-4db1-ae54-ffac96184dd5" target="_blank" rel="noopener noreferrer">Microsoft&rsquo;s Copilot prompt guidance</a> describes four useful components: Goal, Context, Source, and Expectations, while noting that only a clear goal is required. <a href="https://docs.github.com/en/copilot/get-started/best-practices-for-using-github-copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot best practices</a> additionally recommend relevant context, examples, specific requirements, smaller tasks, iteration, and validation. Prompt Guide labels Constraints and Verification as its own coding extensions.</p></details>
+            <details><summary>What the coach can detect</summary><p>Visible language signals: action verbs, audience or situation, named files and error evidence, constraints, testable completion criteria, requested formats, repetition, filler, and conflicting phrases.</p></details>
+            <details><summary>What it cannot judge</summary><p>Whether context is factually correct, whether a named file is truly relevant, whether the model will succeed, or whether a technical solution is safe. Treat every finding as a review prompt, verify generated work with appropriate tests and human judgment, and apply additional review for consequential uses.</p></details>
+            <details><summary>How model pricing comparison works</summary><p>The page uses a simple, provider-independent word-and-punctuation heuristic for prompt tokens, then applies a dated snapshot of official Azure OpenAI Global Standard and Vertex AI Global text API rates. Actual tokenization varies by model, content, and provider; use provider-reported usage for billing reconciliation. A model name alone is not a billable SKU, so every row names its hosting platform and deployment basis and links to its official source. Cache schemes that require storage or write charges are not ranked against simple discounted-input caching.</p></details>
+            <details><summary>What pricing is excluded</summary><p>GitHub Copilot, ChatGPT, and Claude subscriptions use licenses or credits rather than these API token rates. The estimate also excludes enterprise agreements, taxes, currency conversion, batch, priority, regional, provisioned, long-context, media, tools, grounding, hidden instructions, retrieved history, retries, and provider rounding. For reasoning models, billed output can include hidden reasoning tokens; enter total expected billable output because this page does not predict that hidden-token volume.</p></details>
+          </div>
+          <div class="panel">
+            <header class="panel-head"><div><h3>Local learning data</h3><p>Progress stays in this browser.</p></div></header>
+            <div class="editor-body">
+              <p>No prompt, draft, score, or learning record is sent anywhere. Export excludes drafts unless you explicitly include them.</p>
+              <div class="actions"><button class="btn secondary" type="button" id="export-btn">Export progress</button><label class="btn secondary file-btn" for="import-input">Import progress</label><input class="sr-only" id="import-input" type="file" accept="application/json,.json"><button class="btn quiet" type="button" id="reset-progress-btn">Reset progress</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap">Prompt Guide is an independent educational offline tool. Coaching signals are hypotheses, not guarantees of model behavior. It is not affiliated with, endorsed by, or certified by Microsoft. Microsoft, Azure, and Copilot are trademarks of the Microsoft group of companies.</div></footer>
+
+  <script>
+    'use strict';
+
+    const BLUEPRINT = [
+      { id: 'goal', name: 'Goal', description: 'What Copilot should do', origin: 'Microsoft element' },
+      { id: 'context', name: 'Context', description: 'Why it matters, the situation, or the audience', origin: 'Microsoft element' },
+      { id: 'source', name: 'Source', description: 'Relevant code, file, error, example, or data', origin: 'Microsoft element' },
+      { id: 'expectations', name: 'Expectations', description: 'How Copilot should respond', origin: 'Microsoft element' },
+      { id: 'constraints', name: 'Constraints', description: 'Scope boundaries and non-goals', origin: 'Lab coding extension' },
+      { id: 'verification', name: 'Verification', description: 'Observable definition of done', origin: 'Lab coding extension' }
+    ];
+
+    const ACTION_RE = /\b(fix|explain|review|compare|summari[sz]e|implement|create|write|refactor|debug|identify|plan|update|remove|add|test|analy[sz]e)\b/i;
+    const TARGET_RE = /\b(file|function|class|method|component|test|error|bug|endpoint|api|query|module|code|change|diff|implementation|plan)\b/i;
+    const CONTEXT_RE = /\b(?:because|after|before|when|for (?:a|an|the)|audience|user|maintainer|beginner|reviewer|scenario|currently|existing|purpose|so that|need to|in order to)\b/i;
+    const SOURCE_RE = /(`[^`]+`|\b[\w-]+\.(?:js|ts|tsx|jsx|py|cs|java|go|rs|html|css|json|yml|yaml|md|sql)\b|\b(?:function|class|method|component|module|line|selection|terminal|error|fails?|failure|exception|stack trace|diagnostic|expected|actual|repro(?:duce|duction)?|log|message|observed|example|test|diff)\b)/i;
+    const CONSTRAINT_RE = /\b(do not|don't|must not|without changing|only|keep|preserve|avoid|limit|no new|within|scope|non-goal)\b/i;
+    const VERIFICATION_RE = /\b(tests? pass|verify|acceptance|done when|must return|should return|expected result|build passes|lint passes|compiles?|success criteria|regression test|run the .*tests?|test suite)\b/i;
+    const EXPECTATIONS_RE = /\b(bullets?|table|patch|diff|json|steps?|summary|brief|concise|code only|explain(?:ation)?|format|checklist|plan|tone|audience|severity|evidence and|changed-file)\b/i;
+    const VAGUE_RE = /\b(make it better|improve it|fix this|clean (?:it|this|things) up|optimi[sz]e it|do the needful|handle this|something is wrong|doesn't work|not working)\b/i;
+    const FILLER_RE = /\b(please kindly|if you don't mind|i was wondering if|as you may already know|thank you in advance|i hope you are doing well|basically|actually|just wanted to)\b/ig;
+    const CONFLICTS = [
+      [/(?:be|keep it) (?:brief|concise)/i, /(?:exhaustive|very detailed|in great detail|everything)/i, 'The prompt asks for both brevity and exhaustive detail.'],
+      [/do not change (?:the )?(?:code|files?)/i, /\b(?:fix|implement|refactor|update)\b/i, 'The requested action may conflict with “do not change code/files.”'],
+      [/code only/i, /\bexplain|explanation|summary\b/i, '“Code only” conflicts with a request for explanation or summary.']
+    ];
+
+    function estimateTokens(text) {
+      const words = (text.trim().match(/\S+/g) || []).length;
+      const punctuation = (text.match(/[{}()[\],.;:!?]/g) || []).length;
+      return Math.max(0, Math.round(words * 1.28 + punctuation * .18));
+    }
+
+    function calculatePromptCost(settings = {}) {
+      const nonnegative = value => {
+        const number = Number(value);
+        return Number.isFinite(number) ? Math.max(0, number) : 0;
+      };
+      const promptTokens = Math.round(nonnegative(settings.promptTokens));
+      const contextTokens = Math.round(nonnegative(settings.contextTokens));
+      const outputTokens = Math.round(nonnegative(settings.outputTokens));
+      const cachedPercent = Math.min(100, nonnegative(settings.cachedPercent));
+      const runs = Math.max(1, Math.round(nonnegative(settings.runs)) || 1);
+      const inputRate = nonnegative(settings.inputRate);
+      const cachedInputRate = nonnegative(settings.cachedInputRate);
+      const outputRate = nonnegative(settings.outputRate);
+      const totalInputTokens = promptTokens + contextTokens;
+      const cachedTokens = Math.round(totalInputTokens * cachedPercent / 100);
+      const uncachedTokens = totalInputTokens - cachedTokens;
+      const inputCost = (uncachedTokens * inputRate + cachedTokens * cachedInputRate) / 1000000;
+      const outputCost = outputTokens * outputRate / 1000000;
+      const perCallCost = inputCost + outputCost;
+      return { promptTokens, contextTokens, totalInputTokens, cachedTokens, uncachedTokens, outputTokens, runs, inputCost, outputCost, perCallCost, projectedCost: perCallCost * runs };
+    }
+
+    const PRICING_SOURCES = {
+      azure: { label: 'Azure OpenAI pricing', url: 'https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/' },
+      vertex: { label: 'Vertex AI pricing', url: 'https://cloud.google.com/vertex-ai/generative-ai/pricing' },
+      azureCapabilities: { label: 'Microsoft Foundry model capabilities', url: 'https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/models' },
+      azureReasoning: { label: 'Azure reasoning model guidance', url: 'https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/reasoning' }
+    };
+    const PRICING_SNAPSHOT = '2026-07-14';
+    const MODEL_METADATA = {
+      'azure-gpt-chat-latest-05052026': { maxInputTokens: 111616, maxOutputTokens: 16384, lifecycleStage: 'preview', reasoning: true },
+      'azure-gpt-5-5': { maxInputTokens: 922000, maxOutputTokens: 128000, pricingInputThreshold: 272000, pricingThresholdInclusive: true, reasoning: true },
+      'azure-gpt-5-4': { maxInputTokens: 922000, maxOutputTokens: 128000, pricingInputThreshold: 272000, pricingThresholdInclusive: true, reasoning: true },
+      'azure-gpt-5-4-pro': { maxInputTokens: 922000, maxOutputTokens: 128000, pricingInputThreshold: 272000, pricingThresholdInclusive: true, reasoning: true },
+      'azure-gpt-5-4-mini': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-4-nano': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-3-codex': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-3-chat': { maxInputTokens: 111616, maxOutputTokens: 16384, lifecycleStage: 'preview' },
+      'azure-gpt-5-2': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-2-chat-latest': { maxInputTokens: 111616, maxOutputTokens: 16384, lifecycleStage: 'preview' },
+      'azure-gpt-5-2-codex': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-1': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-1-chat': { maxInputTokens: 111616, maxOutputTokens: 16384, lifecycleStage: 'preview', reasoning: true },
+      'azure-gpt-5-1-codex': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-1-codex-max': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-1-codex-mini': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-2025-08-07': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-chat': { maxContextTokens: 128000, maxOutputTokens: 16384, lifecycleStage: 'preview' },
+      'azure-gpt-5-codex': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-pro': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-mini': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-5-nano': { maxInputTokens: 272000, maxOutputTokens: 128000, reasoning: true },
+      'azure-gpt-4-1': { maxContextTokens: 300000, maxOutputTokens: 32768 },
+      'azure-gpt-4-1-mini': { maxContextTokens: 300000, maxOutputTokens: 32768 },
+      'azure-gpt-4-1-nano': { maxContextTokens: 300000, maxOutputTokens: 32768 },
+      'azure-gpt-4o-2024-11-20': { maxInputTokens: 128000, maxOutputTokens: 16384 },
+      'azure-gpt-4o-2024-08-06': { maxInputTokens: 128000, maxOutputTokens: 16384 },
+      'azure-gpt-4o-2024-05-13': { maxInputTokens: 128000, maxOutputTokens: 4096 },
+      'azure-gpt-4o-mini-0718': { maxInputTokens: 128000, maxOutputTokens: 16384 },
+      'azure-o1-2024-12-17': { maxInputTokens: 200000, maxOutputTokens: 100000, reasoning: true },
+      'azure-o1-mini-2024-09-12': { maxInputTokens: 128000, maxOutputTokens: 65536, reasoning: true },
+      'azure-o3': { maxInputTokens: 200000, maxOutputTokens: 100000, reasoning: true },
+      'azure-o3-mini-2025-01-31': { maxInputTokens: 200000, maxOutputTokens: 100000, reasoning: true },
+      'azure-o4-mini-2025-04-16': { maxInputTokens: 200000, maxOutputTokens: 100000, reasoning: true },
+      'azure-gpt-oss-120b': { maxContextTokens: 131072, maxOutputTokens: 131072, lifecycleStage: 'preview', reasoning: true },
+      'vertex-gemini-3-1-pro': { pricingInputThreshold: 200000, pricingThresholdInclusive: false, lifecycleStage: 'preview', reasoning: true },
+      'vertex-gemini-3-1-flash-lite': { pricingInputThreshold: 200000, pricingThresholdInclusive: false, reasoning: true },
+      'vertex-gemini-2-5-flash': { pricingInputThreshold: 200000, pricingThresholdInclusive: false, reasoning: true },
+      'vertex-claude-sonnet-5': { pricingInputThreshold: 200000, pricingThresholdInclusive: true, reasoning: true, ratePeriods: [
+        { effectiveFrom: PRICING_SNAPSHOT, effectiveTo: '2026-08-31', inputRate: 2, cachedInputRate: .2, outputRate: 10, label: 'Promotional rate verified 2026-07-14 through 2026-08-31' },
+        { effectiveFrom: '2026-09-01', inputRate: 3, cachedInputRate: .3, outputRate: 15, label: 'Standard rate from 2026-09-01' }
+      ] },
+      'vertex-claude-sonnet-4-6': { pricingInputThreshold: 200000, pricingThresholdInclusive: true, reasoning: true },
+      'vertex-claude-haiku-4-5': { pricingInputThreshold: 200000, pricingThresholdInclusive: true },
+      'vertex-claude-opus-4-8': { pricingInputThreshold: 200000, pricingThresholdInclusive: true, reasoning: true }
+    };
+    const MODEL_PRICING_CATALOG = [
+      { id: 'azure-gpt-chat-latest-05052026', model: 'GPT-Chat Latest 05052026', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 5, cachedInputRate: .5, outputRate: 30, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-5', model: 'GPT-5.5', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 5, cachedInputRate: .5, outputRate: 30, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-4', model: 'GPT-5.4 (<272K input pricing tier)', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 2.5, cachedInputRate: .25, outputRate: 15, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-4-pro', model: 'GPT-5.4 Pro (<272K input pricing tier)', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 30, cachedInputRate: null, outputRate: 180, cacheSemantics: 'none', source: 'azure' },
+      { id: 'azure-gpt-5-4-mini', model: 'GPT-5.4 Mini', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .75, cachedInputRate: .08, outputRate: 4.5, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-4-nano', model: 'GPT-5.4 Nano', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .2, cachedInputRate: .02, outputRate: 1.25, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-3-codex', model: 'GPT-5.3 Codex', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.75, cachedInputRate: .18, outputRate: 14, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-3-chat', model: 'GPT-5.3 Chat', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.75, cachedInputRate: .18, outputRate: 14, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-2', model: 'GPT-5.2', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.75, cachedInputRate: .18, outputRate: 14, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-2-chat-latest', model: 'GPT-5.2 Chat Latest', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.75, cachedInputRate: .18, outputRate: 14, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-2-codex', model: 'GPT-5.2 Codex', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.75, cachedInputRate: .18, outputRate: 14, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-1', model: 'GPT-5.1', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-1-chat', model: 'GPT-5.1 Chat', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-1-codex', model: 'GPT-5.1 Codex', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-1-codex-max', model: 'GPT-5.1 Codex Max', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-1-codex-mini', model: 'GPT-5.1 Codex Mini', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .25, cachedInputRate: .03, outputRate: 2, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-2025-08-07', model: 'GPT-5 2025-08-07', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-chat', model: 'GPT-5 Chat', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-codex', model: 'GPT-5 Codex', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.25, cachedInputRate: .13, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-pro', model: 'GPT-5 Pro', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 15, cachedInputRate: null, outputRate: 120, cacheSemantics: 'none', source: 'azure' },
+      { id: 'azure-gpt-5-mini', model: 'GPT-5 Mini', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .25, cachedInputRate: .03, outputRate: 2, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-5-nano', model: 'GPT-5 Nano', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .05, cachedInputRate: .01, outputRate: .4, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4-1', model: 'GPT-4.1 2025-04-14', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 2, cachedInputRate: .5, outputRate: 8, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4-1-mini', model: 'GPT-4.1 Mini 2025-04-14', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .4, cachedInputRate: .1, outputRate: 1.6, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4-1-nano', model: 'GPT-4.1 Nano 2025-04-14', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .1, cachedInputRate: .03, outputRate: .4, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4o-2024-11-20', model: 'GPT-4o 2024-11-20', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 2.5, cachedInputRate: 1.25, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4o-2024-08-06', model: 'GPT-4o 2024-08-06', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 2.5, cachedInputRate: 1.25, outputRate: 10, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-4o-2024-05-13', model: 'GPT-4o 2024-05-13', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 5, cachedInputRate: null, outputRate: 15, cacheSemantics: 'none', source: 'azure' },
+      { id: 'azure-gpt-4o-mini-0718', model: 'GPT-4o Mini 0718', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: .15, cachedInputRate: .075, outputRate: .6, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-o1-2024-12-17', model: 'o1 2024-12-17', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 15, cachedInputRate: 7.5, outputRate: 60, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-o1-mini-2024-09-12', model: 'o1 Mini 2024-09-12', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.1, cachedInputRate: .55, outputRate: 4.4, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-o3', model: 'o3 2025-04-16', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 2, cachedInputRate: .5, outputRate: 8, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-o3-mini-2025-01-31', model: 'o3 Mini 2025-01-31', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.1, cachedInputRate: .55, outputRate: 4.4, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-o4-mini-2025-04-16', model: 'o4 Mini 2025-04-16', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Global Standard', inputRate: 1.1, cachedInputRate: .28, outputRate: 4.4, cacheSemantics: 'discounted-input', source: 'azure' },
+      { id: 'azure-gpt-oss-120b', model: 'gpt-oss-120b', provider: 'OpenAI', platform: 'Azure OpenAI', deployment: 'Standard', inputRate: .15, cachedInputRate: null, outputRate: .6, cacheSemantics: 'none', source: 'azure', caveat: 'Azure lists this open-weight model separately from Global deployment SKUs.' },
+      { id: 'vertex-gemini-3-1-pro', model: 'Gemini 3.1 Pro Preview', provider: 'Google', platform: 'Vertex AI', deployment: 'Global Standard', inputRate: 2, cachedInputRate: null, outputRate: 12, cacheSemantics: 'storage-based', source: 'vertex', caveat: 'Explicit cache storage uses separate token-hour pricing.' },
+      { id: 'vertex-gemini-3-1-flash-lite', model: 'Gemini 3.1 Flash-Lite', provider: 'Google', platform: 'Vertex AI', deployment: 'Global Standard', inputRate: .25, cachedInputRate: null, outputRate: 1.5, cacheSemantics: 'storage-based', source: 'vertex', caveat: 'Explicit cache storage uses separate token-hour pricing.' },
+      { id: 'vertex-gemini-2-5-flash', model: 'Gemini 2.5 Flash', provider: 'Google', platform: 'Vertex AI', deployment: 'Global Standard', inputRate: .3, cachedInputRate: null, outputRate: 2.5, cacheSemantics: 'storage-based', source: 'vertex', caveat: 'Explicit cache storage uses separate token-hour pricing.' },
+      { id: 'vertex-claude-sonnet-5', model: 'Claude Sonnet 5', provider: 'Anthropic', platform: 'Vertex AI partner model', deployment: 'Global', inputRate: 2, cachedInputRate: .2, outputRate: 10, cacheSemantics: 'hit-plus-write', source: 'vertex', caveat: 'Cache writes cost extra and are not included.' },
+      { id: 'vertex-claude-sonnet-4-6', model: 'Claude Sonnet 4.6', provider: 'Anthropic', platform: 'Vertex AI partner model', deployment: 'Global', inputRate: 3, cachedInputRate: .3, outputRate: 15, cacheSemantics: 'hit-plus-write', source: 'vertex', caveat: 'Cache writes cost extra and are not included.' },
+      { id: 'vertex-claude-haiku-4-5', model: 'Claude Haiku 4.5', provider: 'Anthropic', platform: 'Vertex AI partner model', deployment: 'Global', inputRate: 1, cachedInputRate: .1, outputRate: 5, cacheSemantics: 'hit-plus-write', source: 'vertex', caveat: 'Cache writes cost extra and are not included.' },
+      { id: 'vertex-claude-opus-4-8', model: 'Claude Opus 4.8', provider: 'Anthropic', platform: 'Vertex AI partner model', deployment: 'Global', inputRate: 5, cachedInputRate: .5, outputRate: 25, cacheSemantics: 'hit-plus-write', source: 'vertex', caveat: 'Cache writes cost extra and are not included.' }
+    ].map(entry => Object.freeze({ ...entry, ...MODEL_METADATA[entry.id], pricingMode: 'standard', modality: 'text', currency: 'USD', verifiedAt: PRICING_SNAPSHOT, lifecycleStage: MODEL_METADATA[entry.id]?.lifecycleStage || 'ga' }));
+
+    function validatePricingCatalog(catalog = MODEL_PRICING_CATALOG) {
+      const errors = [];
+      const ids = new Set();
+      const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+      catalog.forEach((entry, index) => {
+        if (!entry.id || ids.has(entry.id)) errors.push(`Entry ${index} has a missing or duplicate ID.`);
+        ids.add(entry.id);
+        if (!entry.model || !entry.provider || !entry.platform || !entry.deployment) errors.push(`${entry.id || index} has incomplete SKU identity.`);
+        if (!['discounted-input', 'storage-based', 'hit-plus-write', 'none'].includes(entry.cacheSemantics)) errors.push(`${entry.id || index} has unsupported cache semantics.`);
+        if (![entry.inputRate, entry.outputRate].every(value => Number.isFinite(value) && value >= 0)) errors.push(`${entry.id || index} has invalid rates.`);
+        if (entry.cacheSemantics === 'discounted-input' && !(Number.isFinite(entry.cachedInputRate) && entry.cachedInputRate >= 0)) errors.push(`${entry.id || index} has an invalid cached-input rate.`);
+        if (entry.cacheSemantics === 'none' && entry.cachedInputRate !== null) errors.push(`${entry.id || index} lists a cached rate without cache support.`);
+        if (entry.cacheSemantics === 'storage-based' && entry.cachedInputRate !== null) errors.push(`${entry.id || index} must not represent storage pricing as a cached-input rate.`);
+        if (entry.cacheSemantics === 'hit-plus-write' && !(Number.isFinite(entry.cachedInputRate) && entry.cachedInputRate >= 0 && entry.caveat)) errors.push(`${entry.id || index} has incomplete cache hit/write metadata.`);
+        if (!isoDate.test(entry.verifiedAt || '') || !PRICING_SOURCES[entry.source]) errors.push(`${entry.id || index} has invalid source metadata.`);
+        if (!['ga', 'preview', 'deprecated'].includes(entry.lifecycleStage)) errors.push(`${entry.id || index} has an invalid lifecycle stage.`);
+        ['pricingInputThreshold', 'maxInputTokens', 'maxContextTokens', 'maxOutputTokens'].forEach(field => {
+          if (entry[field] !== undefined && !(Number.isFinite(entry[field]) && entry[field] > 0)) errors.push(`${entry.id || index} has an invalid ${field}.`);
+        });
+        if (entry.maxInputTokens && entry.pricingInputThreshold && entry.pricingInputThreshold > entry.maxInputTokens) errors.push(`${entry.id || index} has a pricing threshold above its input limit.`);
+        if (entry.ratePeriods) entry.ratePeriods.forEach((period, periodIndex) => {
+          if (!isoDate.test(period.effectiveFrom || '') || (period.effectiveTo && (!isoDate.test(period.effectiveTo) || period.effectiveTo < period.effectiveFrom))) errors.push(`${entry.id || index} has invalid rate period ${periodIndex}.`);
+          if (![period.inputRate, period.outputRate].every(value => Number.isFinite(value) && value >= 0)) errors.push(`${entry.id || index} has invalid rates in period ${periodIndex}.`);
+        });
+        if (entry.pricingMode !== 'standard' || entry.modality !== 'text' || entry.currency !== 'USD') errors.push(`${entry.id || index} is outside the supported pricing basis.`);
+      });
+      return { valid: errors.length === 0, errors };
+    }
+
+    function resolveRates(entry, asOf) {
+      if (!entry.ratePeriods) return { inputRate: entry.inputRate, cachedInputRate: entry.cachedInputRate, outputRate: entry.outputRate, ratePeriodLabel: '' };
+      const period = entry.ratePeriods.find(candidate => asOf >= candidate.effectiveFrom && (!candidate.effectiveTo || asOf <= candidate.effectiveTo));
+      return period ? { ...period, ratePeriodLabel: period.label } : null;
+    }
+
+    function calculateModelComparison(promptTokens, workload = {}, selectedModelIds = [], catalog = MODEL_PRICING_CATALOG, customProfile = {}) {
+      const uniqueIds = [...new Set(selectedModelIds)].slice(0, 3);
+      const totalInputTokens = Math.max(0, Math.round(Number(promptTokens) || 0)) + Math.max(0, Math.round(Number(workload.contextTokens) || 0));
+      const outputTokens = Math.max(0, Math.round(Number(workload.outputTokens) || 0));
+      const cachingRequested = Math.max(0, Math.min(100, Number(workload.cachedPercent) || 0)) > 0;
+      const asOf = /^\d{4}-\d{2}-\d{2}$/.test(String(workload.asOf || '')) ? String(workload.asOf) : PRICING_SNAPSHOT;
+      const resolve = id => id === 'custom' ? {
+        id: 'custom', model: customProfile.label || 'Custom rate profile', provider: 'User supplied', platform: 'Custom', deployment: 'Custom',
+        inputRate: customProfile.inputRate, cachedInputRate: customProfile.cachedInputRate, outputRate: customProfile.outputRate,
+        cacheSemantics: 'discounted-input', source: null, verifiedAt: null, lifecycleStage: 'custom'
+      } : catalog.find(entry => entry.id === id);
+      const results = uniqueIds.map(resolve).filter(Boolean).map(entry => {
+        const rates = resolveRates(entry, asOf);
+        const outsidePricingScope = Boolean(entry.pricingInputThreshold && (entry.pricingThresholdInclusive ? totalInputTokens >= entry.pricingInputThreshold : totalInputTokens > entry.pricingInputThreshold));
+        const exceedsInputLimit = Boolean(entry.maxInputTokens && totalInputTokens > entry.maxInputTokens);
+        const exceedsOutputLimit = Boolean(entry.maxOutputTokens && outputTokens > entry.maxOutputTokens);
+        const exceedsContextLimit = Boolean(entry.maxContextTokens && totalInputTokens + outputTokens > entry.maxContextTokens);
+        const capabilityUnknown = !(entry.maxInputTokens || entry.maxContextTokens) || !entry.maxOutputTokens;
+        const cacheCompatible = !cachingRequested || entry.cacheSemantics === 'discounted-input';
+        const blocked = !rates || outsidePricingScope || exceedsInputLimit || exceedsOutputLimit || exceedsContextLimit;
+        const estimate = blocked ? null : calculatePromptCost({
+          promptTokens, contextTokens: workload.contextTokens, outputTokens: workload.outputTokens, runs: workload.runs,
+          cachedPercent: cacheCompatible ? workload.cachedPercent : 0, inputRate: rates.inputRate,
+          cachedInputRate: Number.isFinite(Number(rates.cachedInputRate)) ? rates.cachedInputRate : rates.inputRate, outputRate: rates.outputRate
+        });
+        return { ...entry, ...rates, estimate, outsidePricingScope, exceedsInputLimit, exceedsOutputLimit, exceedsContextLimit, capabilityUnknown, cacheCompatible, cacheFallback: cachingRequested && !cacheCompatible, comparable: !blocked && cacheCompatible };
+      });
+      const rankingComparable = results.length > 0 && results.every(result => result.comparable);
+      const lowest = rankingComparable ? Math.min(...results.map(result => result.estimate.projectedCost)) : null;
+      return { results: results.map(result => ({ ...result, lowest: lowest !== null && Math.abs(result.estimate.projectedCost - lowest) < 1e-12 })), rankingComparable, cachingRequested, unknownIds: uniqueIds.filter(id => !resolve(id)) };
+    }
+
+    function repeatedSentences(text) {
+      const seen = new Set();
+      return text.split(/[.!?\n]+/).map(s => s.trim().toLowerCase()).filter(s => s.length > 18).filter(s => seen.has(s) || !seen.add(s));
+    }
+
+    function analyzePrompt(text) {
+      const clean = text.trim();
+      const words = clean.match(/\S+/g) || [];
+      const sentences = clean.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim()).filter(Boolean);
+      const dimensions = {
+        goal: ACTION_RE.test(clean) && TARGET_RE.test(clean),
+        context: CONTEXT_RE.test(clean),
+        source: SOURCE_RE.test(clean),
+        expectations: EXPECTATIONS_RE.test(clean),
+        constraints: CONSTRAINT_RE.test(clean),
+        verification: VERIFICATION_RE.test(clean)
+      };
+      const findings = [];
+      const add = (id, title, detail, severity, match = '') => findings.push({ id, title, detail, severity, match });
+      if (!clean) add('empty', 'Start with a goal', 'Name the action and the thing Copilot should work on.', 'warn');
+      if (clean && !dimensions.goal) add('goal', 'Goal is hard to locate', 'Use a direct action and a concrete target, such as “Fix the failing checkout test.”', 'warn');
+      if (clean && !dimensions.context) add('context', 'Context is unstated', 'Explain the situation, purpose, or audience when it would change the response.', 'info');
+      if (clean && !dimensions.source) add('source', 'No source signal', 'Name relevant code, a file, an exact error, an example, or other trusted input when known.', 'info');
+      if (clean && !dimensions.expectations) add('expectations', 'Response expectations are open', 'Describe a useful format, focus, detail level, or audience only when it helps your workflow.', 'info');
+      if (clean && !dimensions.constraints) add('constraints', 'Boundaries are unstated', 'Add a real boundary only if one matters; do not invent constraints for the score.', 'info');
+      if (clean && !dimensions.verification) add('verification', 'Completion cannot be checked', 'For implementation work, state an observable result such as a passing test or expected return value.', 'warn');
+      const vague = clean.match(VAGUE_RE);
+      if (vague) add('vague', 'Vague goal detected', 'Replace the highlighted phrase with the behavior that should change.', 'warn', vague[0]);
+      const filler = clean.match(FILLER_RE) || [];
+      if (filler.length) add('filler', 'Low-value setup language', `Found ${filler.length} phrase${filler.length === 1 ? '' : 's'} that can usually be removed.`, 'info', filler[0]);
+      const repeated = repeatedSentences(clean);
+      if (repeated.length) add('repeat', 'Repeated instruction', 'One or more sentences repeat the same wording.', 'info', repeated[0]);
+      CONFLICTS.forEach(([left, right, message], index) => {
+        if (left.test(clean) && right.test(clean)) add(`conflict-${index}`, 'Possible instruction conflict', message, 'warn');
+      });
+      const goalCount = (clean.match(/\b(?:and also|also|while you are|while you're|as well as|plus)\b/ig) || []).length;
+      if (goalCount > 1) add('goals', 'Several goals may compete', 'Consider separating independent outcomes into phases or requests.', 'warn');
+      const present = Object.values(dimensions).filter(Boolean).length;
+      const readiness = clean ? Math.min(100, Math.round(18 + present * 12 + (dimensions.goal ? 5 : 0) + (dimensions.verification ? 5 : 0) - findings.filter(f => f.severity === 'warn' && !Object.keys(dimensions).includes(f.id)).length * 7)) : 0;
+      const tokenEstimate = estimateTokens(clean);
+      let efficiency = clean ? 92 : 0;
+      efficiency -= Math.min(24, filler.length * 8);
+      efficiency -= Math.min(18, repeated.length * 9);
+      efficiency -= Math.max(0, Math.min(28, (words.length - 120) / 5));
+      efficiency -= Math.min(18, goalCount * 5);
+      if (words.length > 0 && words.length < 5) efficiency -= 28;
+      efficiency = Math.max(0, Math.round(efficiency));
+      const confidence = present >= 4 || words.length >= 25 ? 'High signal coverage' : present >= 2 ? 'Partial signal coverage' : 'Limited signal coverage';
+      return { dimensions, findings, readiness, efficiency, confidence, words: words.length, tokenEstimate, sentences };
+    }
+
+    const MISSIONS = [
+      {
+        id: 'repair-bug', mode: 'repair', level: 'Beginner', title: 'Make the task testable',
+        brief: 'A checkout test fails after a small refactor. Ask Copilot to fix it safely.',
+        starter: 'Please fix this. It is not working and I need it to be better.',
+        required: ['goal', 'source', 'verification'], target: 66,
+        hints: ['What exact behavior is failing?', 'Name the failing checkout test or the relevant function.', 'Add the observed error and one observable definition of done.', 'Example structure: Fix [failure] in [location]. Evidence: [error]. Preserve [boundary]. Done when [test].']
+      },
+      {
+        id: 'repair-explain', mode: 'repair', level: 'Beginner', title: 'Ask for an explanation you can use',
+        brief: 'You inherited a caching function and need to understand its decisions before editing it.',
+        starter: 'Explain this code in great detail but keep it very brief and tell me everything.',
+        required: ['goal', 'source', 'expectations'], target: 58,
+        hints: ['Who is the explanation for, and what decision should it support?', 'Name the caching function or selected code.', 'Resolve the conflict between “very brief” and “everything.”', 'Example structure: Explain [symbol] for a maintainer. Focus on [decisions]. Use [format].']
+      },
+      {
+        id: 'repair-review', mode: 'repair', level: 'Intermediate', title: 'Turn “review this” into a risk review',
+        brief: 'A pull request changes authorization checks. You need a focused review, not a general summary.',
+        starter: 'Review this change and let me know what you think. Please kindly be comprehensive.',
+        required: ['goal', 'source', 'constraints', 'expectations'], target: 68,
+        hints: ['What kinds of failure matter most in authorization code?', 'Scope the review to the changed authorization path.', 'State non-goals and request findings with evidence.', 'Example structure: Review [diff] for [risk types]. Ignore [non-goals]. Return [severity, evidence, fix].']
+      },
+      {
+        id: 'repair-feature', mode: 'repair', level: 'Transfer', title: 'Separate planning from implementation',
+        brief: 'You want a CSV export, but requirements are incomplete. Ask Copilot to plan before changing files.',
+        starter: 'Add CSV export and also refactor the reports module plus improve the UI while you are there.',
+        required: ['goal', 'constraints', 'verification', 'expectations'], target: 72,
+        hints: ['How many independent outcomes are hiding in this request?', 'Keep CSV export as the current goal; move unrelated work out.', 'Ask for a plan and open questions before implementation.', 'Example structure: Plan [feature] only. Preserve [boundary]. Identify open questions. Success means [observable behavior].']
+      },
+      {
+        id: 'build-bug', mode: 'build', level: 'Beginner', title: 'Assemble a debugging request',
+        brief: 'Build a prompt for a null error in the login flow. Select useful blocks; distracting blocks are included.',
+        starter: '', required: ['goal', 'source', 'verification'], target: 66,
+        blocks: ['Fix the null error in `LoginService.authenticate`.', 'Evidence: `Cannot read properties of undefined (reading expiresAt)`.', 'Preserve the public login API.', 'Done when the login tests pass and an expired-token regression test exists.', 'Tell me the complete history of authentication.', 'Use a patch and a three-bullet explanation.'],
+        hints: ['Choose blocks that reduce uncertainty about this failure.', 'Outcome, error evidence, location, and proof of completion are high-value here.', 'Historical background is not required unless it changes the fix.', 'A strong package uses blocks 1, 2, 3, 4, and optionally 6.']
+      },
+      {
+        id: 'build-explain', mode: 'build', level: 'Intermediate', title: 'Budget an explanation',
+        brief: 'Build a prompt that helps a new maintainer understand retry behavior without requesting an essay.',
+        starter: '', required: ['goal', 'context', 'source', 'constraints', 'expectations'], target: 64,
+        blocks: ['Explain the retry decisions in `requestWithBackoff`.', 'Audience: a maintainer new to this module.', 'Focus on stop conditions and error propagation.', 'Use a short decision table plus one example.', 'Explain every line in the repository.', 'Do not propose code changes.'],
+        hints: ['What does the learner need to decide after reading?', 'Select a symbol, focus area, boundary, and useful format.', 'Avoid repository-wide explanation.', 'Blocks 1, 2, 3, 4, and 6 form a focused request.']
+      },
+      {
+        id: 'build-review', mode: 'build', level: 'Intermediate', title: 'Build an actionable code review',
+        brief: 'Create a review prompt for a database migration that must be reversible.',
+        starter: '', required: ['goal', 'source', 'constraints', 'verification', 'expectations'], target: 74,
+        blocks: ['Review `2026_07_add_region.sql` and its rollback.', 'Focus on data loss, locking, and backward compatibility.', 'Do not review naming or formatting.', 'For each finding, include severity, evidence, and a concrete mitigation.', 'The review is complete when forward and rollback paths are addressed.', 'Also redesign the database layer.'],
+        hints: ['A review benefits from explicit risk categories.', 'Include scope, non-goals, evidence format, and completion coverage.', 'Do not combine review with redesign.', 'The first five blocks create a strong review contract.']
+      },
+      {
+        id: 'build-feature', mode: 'build', level: 'Transfer', title: 'Build a staged agent request',
+        brief: 'Ask Agent mode to add keyboard navigation to a menu with controlled scope.',
+        starter: '', required: ['goal', 'source', 'constraints', 'verification', 'expectations'], target: 76,
+        blocks: ['Implement arrow-key navigation in `CommandMenu.tsx`.', 'Follow the existing focus-management pattern in `Dialog.tsx`.', 'Do not change visual styling or public component props.', 'Add focused tests for ArrowUp, ArrowDown, Home, and End.', 'Run the component test suite and summarize changed files.', 'Modernize all menu components while you are there.'],
+        hints: ['Agent tasks need boundaries and validation.', 'Select the target, nearby pattern, non-goals, tests, and validation.', 'Reject unrelated modernization.', 'The first five blocks define a scoped implementation loop.']
+      },
+      {
+        id: 'predict-bug', mode: 'predict', level: 'Beginner', title: 'Predict debugging drift',
+        brief: 'Read the prompt, predict its likely workflow problems, then reveal the coach analysis.',
+        starter: 'Fix this error and clean up the whole module while you are there.',
+        required: [], target: 0,
+        predictions: ['Goal is vague', 'Several goals may compete', 'Verification is missing', 'Expectations are missing'],
+        expected: ['Goal is vague', 'Several goals may compete', 'Verification is missing'],
+        hints: ['Do not rewrite yet. Ask what choices the model must invent.', 'Look for scope expansion and proof of completion.', 'There are at least three defensible risks.', 'Vague goal, competing goals, and missing verification are the central risks.']
+      },
+      {
+        id: 'predict-explain', mode: 'predict', level: 'Beginner', title: 'Spot a format conflict',
+        brief: 'Predict why this explanation request may produce an awkward answer.',
+        starter: 'Explain `parseConfig` in exhaustive detail. Keep the answer concise and return code only.',
+        required: [], target: 0,
+        predictions: ['Brevity conflicts with exhaustive detail', 'Code-only conflicts with explanation', 'No source is identified', 'The goal is missing'],
+        expected: ['Brevity conflicts with exhaustive detail', 'Code-only conflicts with explanation'],
+        hints: ['Compare each format instruction with the others.', 'Two pairs of instructions pull in opposite directions.', 'Focus on detail level and output type.', 'Exhaustive vs concise; explanation vs code-only.']
+      },
+      {
+        id: 'predict-review', mode: 'predict', level: 'Intermediate', title: 'Distinguish relevance from volume',
+        brief: 'Predict the cost and focus risks in a broad review request.',
+        starter: 'Review every file in the repository for all possible problems and explain everything in detail.',
+        required: [], target: 0,
+        predictions: ['Scope may trigger excessive context', 'Risk categories are unstated', 'The response may be very long', 'Acceptance coverage is unclear'],
+        expected: ['Scope may trigger excessive context', 'Risk categories are unstated', 'The response may be very long', 'Acceptance coverage is unclear'],
+        hints: ['Ask whether the request has a useful stopping rule.', 'Notice both input scope and output scope.', 'All four listed consequences are plausible.', 'The prompt is broad in files, risks, output, and completion.']
+      },
+      {
+        id: 'predict-feature', mode: 'predict', level: 'Transfer', title: 'Predict agent overreach',
+        brief: 'Predict what an autonomous coding agent may have to decide for itself.',
+        starter: 'Build a better dashboard. Use whatever libraries you think are best.',
+        required: [], target: 0,
+        predictions: ['“Better” is undefined', 'Dependency policy is unconstrained', 'Verification is missing', 'The target file is explicit'],
+        expected: ['“Better” is undefined', 'Dependency policy is unconstrained', 'Verification is missing'],
+        hints: ['Which product and engineering decisions are delegated accidentally?', 'Look at quality, dependencies, and validation.', 'Three choices lack boundaries.', 'Better, library choice, and done-ness are all undefined.']
+      }
+    ];
+
+    const STORAGE_KEY = 'prompt-guide-progress-v1';
+    const LEGACY_STORAGE_KEYS = ['prompt-flight-lab-progress-v1', 'prompt-coach-progress-v1'];
+    const COST_PRESETS = { short: 300, medium: 1000, long: 2500 };
+    const DEFAULT_MODEL_IDS = ['azure-gpt-5-3-codex', 'vertex-gemini-2-5-flash', 'vertex-claude-sonnet-4-6'];
+    const DEFAULT_COST_SETTINGS = { selectedModelIds: DEFAULT_MODEL_IDS, contextTokens: 0, outputTokens: 1000, cachedPercent: 0, runs: 1, outputPreset: 'medium', catalogVersion: PRICING_SNAPSHOT, customProfile: { label: 'My custom rate', inputRate: 0, cachedInputRate: 0, outputRate: 0 } };
+    const boundedNumber = (value, minimum, maximum, fallback) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.min(maximum, Math.max(minimum, number)) : fallback;
+    };
+    function normalizeCostSettings(settings = {}) {
+      const preset = ['short', 'medium', 'long', 'custom'].includes(settings.outputPreset) ? settings.outputPreset : DEFAULT_COST_SETTINGS.outputPreset;
+      const legacyRates = [settings.inputRate, settings.cachedInputRate, settings.outputRate].map(value => boundedNumber(value, 0, 1000000, 0));
+      const migratedCustom = legacyRates.some(value => value > 0);
+      const allowedIds = new Set([...MODEL_PRICING_CATALOG.map(entry => entry.id), 'custom']);
+      const requestedIds = Array.isArray(settings.selectedModelIds) ? settings.selectedModelIds : migratedCustom ? ['custom', DEFAULT_MODEL_IDS[1], DEFAULT_MODEL_IDS[2]] : DEFAULT_MODEL_IDS;
+      const selectedModelIds = [...new Set(requestedIds.filter(id => allowedIds.has(id)))].slice(0, 3);
+      const custom = settings.customProfile && typeof settings.customProfile === 'object' ? settings.customProfile : {};
+      return {
+        selectedModelIds: selectedModelIds.length ? selectedModelIds : [...DEFAULT_MODEL_IDS],
+        contextTokens: Math.round(boundedNumber(settings.contextTokens, 0, 1000000, 0)),
+        outputTokens: Math.round(boundedNumber(settings.outputTokens, 0, 1000000, COST_PRESETS.medium)),
+        cachedPercent: boundedNumber(settings.cachedPercent, 0, 100, 0),
+        runs: Math.max(1, Math.round(boundedNumber(settings.runs, 1, 1000000, 1))),
+        outputPreset: preset,
+        catalogVersion: PRICING_SNAPSHOT,
+        customProfile: {
+          label: String(custom.label || 'My custom rate').trim().slice(0, 50) || 'My custom rate',
+          inputRate: boundedNumber(custom.inputRate, 0, 1000000, legacyRates[0]),
+          cachedInputRate: boundedNumber(custom.cachedInputRate, 0, 1000000, legacyRates[1]),
+          outputRate: boundedNumber(custom.outputRate, 0, 1000000, legacyRates[2])
+        }
+      };
+    }
+    const defaultState = () => ({ completed: [], best: {}, hints: {}, drafts: {}, predictions: {}, revealed: {}, currentId: 'repair-bug', mode: 'repair', costSettings: normalizeCostSettings(DEFAULT_COST_SETTINGS) });
+    let storageAvailable = true;
+    let state = loadState();
+    let currentAnalysis = analyzePrompt('');
+    let saveTimer;
+
+    const el = id => document.getElementById(id);
+    const promptInput = el('prompt-input');
+    const missionSelect = el('mission-select');
+
+    function loadState() {
+      try {
+        const legacyState = LEGACY_STORAGE_KEYS.map(key => localStorage.getItem(key)).find(Boolean);
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || legacyState || 'null');
+        return saved && Array.isArray(saved.completed) ? { ...defaultState(), ...saved, costSettings: normalizeCostSettings(saved.costSettings) } : defaultState();
+      } catch (error) {
+        storageAvailable = false;
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      if (!storageAvailable) return;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        el('save-state').textContent = 'Saved on this device';
+      } catch (error) {
+        storageAvailable = false;
+        el('save-state').textContent = 'Progress is session-only';
+      }
+    }
+
+    function currentMission() { return MISSIONS.find(m => m.id === state.currentId) || MISSIONS[0]; }
+    function band(score) { return score >= 82 ? 'Strong' : score >= 62 ? 'Developing' : score >= 35 ? 'Partial' : 'Starting'; }
+
+    function renderMissionOptions() {
+      const available = MISSIONS.filter(m => m.mode === state.mode);
+      missionSelect.innerHTML = available.map(m => `<option value="${m.id}"${m.id === state.currentId ? ' selected' : ''}>${m.level} · ${m.title}</option>`).join('');
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      document.querySelectorAll('.mode-tab').forEach(button => button.setAttribute('aria-selected', String(button.dataset.mode === mode)));
+      if (mode === 'sandbox') {
+        state.currentId = 'sandbox';
+      } else if (!MISSIONS.some(m => m.id === state.currentId && m.mode === mode)) {
+        state.currentId = MISSIONS.find(m => m.mode === mode).id;
+      }
+      renderWorkspace();
+      saveState();
+    }
+
+    function renderWorkspace() {
+      const sandbox = state.mode === 'sandbox';
+      const mission = sandbox ? null : currentMission();
+      renderMissionOptions();
+      missionSelect.hidden = sandbox;
+      el('mission-kicker').textContent = sandbox ? 'Open practice · Sandbox' : `${mission.level} · ${mission.mode}`;
+      el('lab-title').textContent = sandbox ? 'Test your own prompt.' : mission.title;
+      el('mission-copy').textContent = sandbox ? 'Paste any prompt. The same transparent offline rules will identify visible strengths, gaps, and efficiency signals.' : mission.brief;
+      el('brief').hidden = sandbox;
+      el('brief-text').textContent = sandbox ? '' : mission.brief;
+      el('workspace-subtitle').textContent = sandbox ? 'The coach cannot judge factual correctness or repository relevance.' : mission.mode === 'predict' ? 'Select likely consequences before revealing the analysis.' : mission.mode === 'build' ? 'Select useful blocks to assemble a focused request.' : 'Improve the request. There is no single correct wording.';
+      const savedDraft = state.drafts[state.currentId];
+      promptInput.value = savedDraft !== undefined ? savedDraft : sandbox ? '' : mission.starter;
+      promptInput.readOnly = Boolean(mission && mission.mode === 'predict');
+      el('check-btn').textContent = mission && mission.mode === 'predict' ? 'Reveal comparison' : 'Check my reasoning';
+      el('hint-box').hidden = true;
+      renderModeControls();
+      updateAnalysis(false);
+    }
+
+    function renderModeControls() {
+      document.querySelectorAll('.choice-bank, .prediction-grid, .result-note').forEach(node => node.remove());
+      const mission = state.mode === 'sandbox' ? null : currentMission();
+      if (!mission) return;
+      if (mission.mode === 'build') {
+        const bank = document.createElement('div');
+        bank.className = 'choice-bank';
+        bank.setAttribute('aria-label', 'Prompt building blocks');
+        mission.blocks.forEach((block, index) => {
+          const button = document.createElement('button');
+          button.type = 'button'; button.className = 'choice'; button.textContent = block; button.dataset.block = block;
+          button.setAttribute('aria-pressed', String(promptInput.value.includes(block)));
+          button.addEventListener('click', () => toggleBlock(button));
+          bank.appendChild(button);
+        });
+        promptInput.before(bank);
+      }
+      if (mission.mode === 'predict') {
+        const grid = document.createElement('div');
+        grid.className = 'prediction-grid';
+        grid.setAttribute('aria-label', 'Predicted consequences');
+        const selected = state.predictions[mission.id] || [];
+        mission.predictions.forEach((prediction, index) => {
+          const label = document.createElement('label'); label.className = 'prediction-option';
+          label.innerHTML = `<input type="checkbox" value="${index}"${selected.includes(prediction) ? ' checked' : ''}><span>${prediction}</span>`;
+          label.querySelector('input').addEventListener('change', collectPredictions);
+          grid.appendChild(label);
+        });
+        promptInput.after(grid);
+      }
+    }
+
+    function toggleBlock(button) {
+      const lines = promptInput.value.split('\n').map(line => line.trim()).filter(Boolean);
+      const index = lines.indexOf(button.dataset.block);
+      if (index >= 0) lines.splice(index, 1); else lines.push(button.dataset.block);
+      promptInput.value = lines.join('\n');
+      button.setAttribute('aria-pressed', String(index < 0));
+      updateAnalysis();
+    }
+
+    function collectPredictions() {
+      const mission = currentMission();
+      state.predictions[mission.id] = [...document.querySelectorAll('.prediction-grid input:checked')].map(input => mission.predictions[Number(input.value)]);
+      saveState();
+    }
+
+    function renderAnalysis(analysis) {
+      renderCostComparison(analysis.tokenEstimate);
+      const mission = state.mode === 'sandbox' ? null : currentMission();
+      const predictionLocked = mission && mission.mode === 'predict' && !state.revealed[mission.id];
+      if (predictionLocked) {
+        el('readiness-score').textContent = '?'; el('efficiency-score').textContent = '?';
+        el('readiness-band').textContent = 'Hidden'; el('efficiency-band').textContent = 'Hidden';
+        el('readiness-meter').style.width = '0%'; el('efficiency-meter').style.width = '0%';
+        el('confidence-text').textContent = 'Commit your prediction before seeing coach signals';
+        el('blueprint').innerHTML = '<p class="empty">Blueprint signals are hidden for this prediction exercise.</p>';
+        el('findings').innerHTML = '<p class="empty">Choose the likely consequences, then reveal the comparison.</p>';
+        el('xray-lines').innerHTML = '<p class="empty">Prompt X-Ray unlocks after your prediction.</p>';
+        el('word-count').textContent = `${analysis.words} words · ~${analysis.tokenEstimate} estimated tokens`;
+        return;
+      }
+      el('readiness-score').textContent = analysis.readiness;
+      el('efficiency-score').textContent = analysis.efficiency;
+      el('readiness-band').textContent = band(analysis.readiness);
+      el('efficiency-band').textContent = band(analysis.efficiency);
+      el('readiness-meter').style.width = `${analysis.readiness}%`;
+      el('efficiency-meter').style.width = `${analysis.efficiency}%`;
+      el('confidence-text').textContent = `${analysis.confidence} · deterministic rules`;
+      el('word-count').textContent = `${analysis.words} words · ~${analysis.tokenEstimate} estimated tokens`;
+      el('blueprint').innerHTML = BLUEPRINT.map(dimension => {
+        const found = analysis.dimensions[dimension.id];
+        return `<div class="dimension"><span class="dimension-name">${dimension.name}</span><span class="dimension-status">${found ? 'Signal found' : dimension.description}</span><span class="status-mark ${found ? 'good' : 'warn'}" aria-label="${found ? 'Signal found' : 'Signal not found'}">${found ? '✓' : '!'}</span></div>`;
+      }).join('');
+      const prioritized = [...analysis.findings].sort((a, b) => (a.severity === 'warn' ? -1 : 1) - (b.severity === 'warn' ? -1 : 1)).slice(0, 4);
+      el('findings').innerHTML = prioritized.length ? prioritized.map(finding => `<button class="finding" type="button" data-match="${escapeHtml(finding.match)}"><span class="finding-icon">${finding.severity === 'warn' ? '!' : 'i'}</span><span><span class="finding-title">${finding.title}</span><span class="finding-detail">${finding.detail}${finding.match ? ` Matched: “${escapeHtml(finding.match)}”` : ''}</span></span></button>`).join('') : '<p class="empty">No obvious rule-based gaps found. Check whether the context itself is correct before sending.</p>';
+      document.querySelectorAll('.finding[data-match]').forEach(button => button.addEventListener('click', () => selectMatch(button.dataset.match)));
+      renderXray(analysis);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    }
+
+    function classifySentence(sentence) {
+      const labels = [];
+      if (ACTION_RE.test(sentence) && TARGET_RE.test(sentence)) labels.push('Goal');
+      if (CONTEXT_RE.test(sentence)) labels.push('Context');
+      if (SOURCE_RE.test(sentence)) labels.push('Source');
+      if (EXPECTATIONS_RE.test(sentence)) labels.push('Expectations');
+      if (CONSTRAINT_RE.test(sentence)) labels.push('Constraint');
+      if (VERIFICATION_RE.test(sentence)) labels.push('Verification');
+      return labels.length ? labels.join(' · ') : 'Unclassified';
+    }
+
+    function renderXray(analysis) {
+      el('xray-lines').innerHTML = analysis.sentences.length ? analysis.sentences.map(sentence => `<article class="xray-line"><b>${classifySentence(sentence)}</b><p>${escapeHtml(sentence)}</p></article>`).join('') : '<p class="empty">Your sentences will appear here as you write.</p>';
+    }
+
+    function selectMatch(match) {
+      if (!match) return;
+      const start = promptInput.value.toLowerCase().indexOf(match.toLowerCase());
+      if (start >= 0) { promptInput.focus(); promptInput.setSelectionRange(start, start + match.length); }
+    }
+
+    function updateAnalysis(persist = true) {
+      currentAnalysis = analyzePrompt(promptInput.value);
+      renderAnalysis(currentAnalysis);
+      if (persist) {
+        state.drafts[state.currentId] = promptInput.value;
+        clearTimeout(saveTimer);
+        el('save-state').textContent = storageAvailable ? 'Saving…' : 'Progress is session-only';
+        saveTimer = setTimeout(saveState, 300);
+      }
+    }
+
+    function formatCost(value) {
+      if (!value) return '$0.00';
+      if (value >= 1) return `$${value.toFixed(2)}`;
+      if (value >= .01) return `$${value.toFixed(4)}`;
+      if (value >= .0001) return `$${value.toFixed(6)}`;
+      return `$${value.toExponential(2)}`;
+    }
+
+    function modelOptionGroups(selectedId, slot) {
+      const azure = MODEL_PRICING_CATALOG.filter(entry => entry.platform === 'Azure OpenAI');
+      const groups = [
+        ['Azure OpenAI · GPT-5.x Global Standard', azure.filter(entry => entry.id.startsWith('azure-gpt-5') || entry.id.startsWith('azure-gpt-chat'))],
+        ['Azure OpenAI · GPT-4.x Global Standard', azure.filter(entry => entry.id.startsWith('azure-gpt-4'))],
+        ['Azure OpenAI · o-series Global Standard', azure.filter(entry => entry.id.startsWith('azure-o'))],
+        ['Azure OpenAI · Open-weight text', azure.filter(entry => entry.id.startsWith('azure-gpt-oss'))],
+        ['Vertex AI · Google models', MODEL_PRICING_CATALOG.filter(entry => entry.provider === 'Google')],
+        ['Vertex AI · Anthropic partner models', MODEL_PRICING_CATALOG.filter(entry => entry.provider === 'Anthropic')]
+      ];
+      const selectedElsewhere = new Set(state.costSettings.selectedModelIds.filter((id, index) => index !== slot));
+      return groups.map(([label, entries]) => `<optgroup label="${label}">${entries.map(entry => `<option value="${entry.id}"${entry.id === selectedId ? ' selected' : ''}${selectedElsewhere.has(entry.id) ? ' disabled' : ''}>${entry.model}</option>`).join('')}</optgroup>`).join('') + `<optgroup label="Other"><option value="custom"${selectedId === 'custom' ? ' selected' : ''}${selectedElsewhere.has('custom') ? ' disabled' : ''}>Custom rate profile</option></optgroup>`;
+    }
+
+    function renderModelSelectors() {
+      el('model-selectors').innerHTML = [0, 1, 2].map(slot => {
+        const selectedId = state.costSettings.selectedModelIds[slot] || '';
+        return `<div class="cost-field"><label for="model-slot-${slot}">Comparison model ${slot + 1}</label><select id="model-slot-${slot}" data-model-slot="${slot}"><option value="">${slot ? 'None' : 'Choose a model'}</option>${modelOptionGroups(selectedId, slot)}</select></div>`;
+      }).join('');
+    }
+
+    function syncCostControls() {
+      const settings = state.costSettings;
+      renderModelSelectors();
+      document.querySelectorAll('[data-workload-setting]').forEach(input => { input.value = settings[input.dataset.workloadSetting]; });
+      document.querySelectorAll('[data-custom-setting]').forEach(input => { input.value = settings.customProfile[input.dataset.customSetting]; });
+      document.querySelectorAll('[data-output-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.outputPreset === settings.outputPreset)));
+      el('custom-profile').hidden = !settings.selectedModelIds.includes('custom');
+    }
+
+    function rateLabel(value) { return Number.isFinite(Number(value)) ? `$${Number(value).toLocaleString()}` : 'Not comparable'; }
+
+    function cacheRateLabel(entry) {
+      if (entry.cacheSemantics === 'discounted-input') return rateLabel(entry.cachedInputRate);
+      if (entry.cacheSemantics === 'hit-plus-write') return `${rateLabel(entry.cachedInputRate)} hit + write`;
+      if (entry.cacheSemantics === 'storage-based') return 'Usage + storage';
+      return 'Not listed';
+    }
+
+    function resultStatus(result, comparison) {
+      const messages = [];
+      if (result.outsidePricingScope) messages.push(`Not estimated: the embedded rate does not cover ${result.pricingThresholdInclusive ? 'input at or above' : 'input above'} ${result.pricingInputThreshold.toLocaleString()} tokens.`);
+      if (result.exceedsInputLimit) messages.push(`Not estimated: input exceeds the documented ${result.maxInputTokens.toLocaleString()}-token limit.`);
+      if (result.exceedsOutputLimit) messages.push(`Not estimated: output exceeds the documented ${result.maxOutputTokens.toLocaleString()}-token limit.`);
+      if (result.exceedsContextLimit) messages.push(`Not estimated: input plus output exceeds the documented ${result.maxContextTokens.toLocaleString()}-token context window.`);
+      if (!result.estimate && !result.outsidePricingScope && !result.exceedsInputLimit && !result.exceedsOutputLimit && !result.exceedsContextLimit) messages.push('Not estimated: no embedded rate applies on the selected date.');
+      if (result.ratePeriodLabel) messages.push(result.ratePeriodLabel + '.');
+      if (result.lifecycleStage === 'preview') messages.push('Preview model; provider guidance advises against relying on preview models for production stability.');
+      if (result.capabilityUnknown && result.lifecycleStage !== 'custom') messages.push('Input or output limits are not verified in this snapshot; check the provider documentation before deployment.');
+      if (result.reasoning) messages.push('Expected output must include billed reasoning tokens, including tokens not visible in the answer.');
+      if (result.cacheFallback) messages.push('Displayed total was recalculated with no cache benefit; cache write or storage charges are excluded, so cached-price ranking is paused.');
+      if (result.caveat && !result.cacheFallback) messages.push(result.caveat);
+      return messages.join(' ');
+    }
+
+    function modelIdentity(result, comparison) {
+      const source = result.source ? PRICING_SOURCES[result.source] : null;
+      const sourceLink = source ? `<a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.label}</a>` : 'User supplied';
+      const capabilityLink = result.platform === 'Azure OpenAI' && (result.maxInputTokens || result.maxContextTokens || result.maxOutputTokens) ? ` · <a href="${PRICING_SOURCES.azureCapabilities.url}" target="_blank" rel="noopener noreferrer">capabilities</a>` : '';
+      const lifecycleLabel = result.lifecycleStage === 'preview' ? 'Preview' : result.lifecycleStage === 'deprecated' ? 'Deprecated' : result.lifecycleStage === 'custom' ? 'User supplied' : 'GA';
+      return `<span class="model-name">${escapeHtml(result.model)}</span><span class="model-meta">${escapeHtml(result.provider)} · ${escapeHtml(result.platform)} / ${escapeHtml(result.deployment)} · ${escapeHtml(lifecycleLabel)}</span><span class="model-meta">${sourceLink}${capabilityLink}${result.verifiedAt ? ` · verified ${result.verifiedAt}` : ''}</span>${result.lowest ? '<span class="lowest-label">Lowest comparable total</span>' : ''}${resultStatus(result, comparison) ? `<span class="model-caveat">${escapeHtml(resultStatus(result, comparison))}</span>` : ''}`;
+    }
+
+    function renderCostComparison(promptTokens) {
+      const settings = state.costSettings;
+      const comparison = calculateModelComparison(promptTokens, { ...settings, asOf: new Date().toISOString().slice(0, 10) }, settings.selectedModelIds, MODEL_PRICING_CATALOG, settings.customProfile);
+      const value = (result, key) => result.estimate ? formatCost(result.estimate[key]) : 'Not estimated';
+      el('comparison-body').innerHTML = comparison.results.map(result => `<tr><td>${modelIdentity(result, comparison)}</td><td>${rateLabel(result.inputRate)}</td><td>${cacheRateLabel(result)}</td><td>${rateLabel(result.outputRate)}</td><td>${value(result, 'inputCost')}</td><td>${value(result, 'outputCost')}</td><td>${value(result, 'perCallCost')}</td><td><strong>${value(result, 'projectedCost')}</strong></td></tr>`).join('');
+      el('comparison-cards').innerHTML = comparison.results.map(result => `<article class="comparison-card">${modelIdentity(result, comparison)}<dl><div class="cost-row"><dt>Rates (input / cached / output)<br>USD per 1M tokens</dt><dd>${rateLabel(result.inputRate)} / ${cacheRateLabel(result)} / ${rateLabel(result.outputRate)}</dd></div><div class="cost-row"><dt>Estimated input cost / call</dt><dd>${value(result, 'inputCost')}</dd></div><div class="cost-row"><dt>Estimated output cost / call</dt><dd>${value(result, 'outputCost')}</dd></div><div class="cost-row"><dt>Estimated total per call</dt><dd>${value(result, 'perCallCost')}</dd></div><div class="cost-row"><dt>Projected total · all runs</dt><dd>${value(result, 'projectedCost')}</dd></div></dl></article>`).join('');
+      const totalInput = Math.max(0, promptTokens) + settings.contextTokens;
+      const blocked = comparison.results.some(result => !result.estimate);
+      const ranking = comparison.rankingComparable ? 'Comparable totals are ranked.' : comparison.cachingRequested && comparison.results.some(result => result.cacheFallback) ? 'Cached-price ranking is paused because at least one total uses an uncached fallback.' : blocked ? 'Ranking is paused because at least one workload cannot be estimated with this snapshot.' : 'Ranking is paused because the selected assumptions are not comparable.';
+      el('comparison-note').textContent = `Workload: ~${promptTokens.toLocaleString()} estimated prompt + ${settings.contextTokens.toLocaleString()} context input tokens, ${settings.outputTokens.toLocaleString()} expected billable output tokens, ${settings.runs.toLocaleString()} run${settings.runs === 1 ? '' : 's'} (${totalInput.toLocaleString()} input per call). ${ranking}`;
+      const reviewDate = new Date(`${PRICING_SNAPSHOT}T00:00:00Z`); reviewDate.setUTCDate(reviewDate.getUTCDate() + 120);
+      const approachingTransition = comparison.results.some(result => result.effectiveTo && (new Date(`${result.effectiveTo}T00:00:00Z`) - new Date()) / 86400000 <= 60 && new Date(`${result.effectiveTo}T00:00:00Z`) >= new Date());
+      el('catalog-warning').textContent = approachingTransition ? 'A selected promotional rate changes within 60 days · transition is modeled' : new Date() > reviewDate ? 'Local review policy: snapshot is over 120 days old · verify official sources' : 'Standard Global text inference · USD per 1M tokens';
+      return comparison;
+    }
+
+    function persistCostSettings() {
+      clearTimeout(saveTimer);
+      el('save-state').textContent = storageAvailable ? 'Saving…' : 'Progress is session-only';
+      saveTimer = setTimeout(saveState, 300);
+    }
+
+    function announceCostEstimate() {
+      el('cost-live').textContent = `Model comparison updated. ${el('comparison-note').textContent}`;
+    }
+
+    function updateCostSetting(event) {
+      const key = event.target.dataset.workloadSetting;
+      const next = { ...state.costSettings, [key]: event.target.value };
+      if (key === 'outputTokens') next.outputPreset = 'custom';
+      state.costSettings = normalizeCostSettings(next);
+      syncCostControls();
+      renderCostComparison(currentAnalysis.tokenEstimate);
+      announceCostEstimate();
+      persistCostSettings();
+    }
+
+    function updateCustomProfile(event) {
+      state.costSettings = normalizeCostSettings({ ...state.costSettings, customProfile: { ...state.costSettings.customProfile, [event.target.dataset.customSetting]: event.target.value } });
+      syncCostControls(); renderCostComparison(currentAnalysis.tokenEstimate); announceCostEstimate(); persistCostSettings();
+    }
+
+    function updateModelSelection(event) {
+      const slot = Number(event.target.dataset.modelSlot);
+      const selected = [...state.costSettings.selectedModelIds];
+      if (event.target.value) selected[slot] = event.target.value; else selected.splice(slot, 1);
+      state.costSettings = normalizeCostSettings({ ...state.costSettings, selectedModelIds: selected.filter(Boolean) });
+      syncCostControls(); renderCostComparison(currentAnalysis.tokenEstimate); announceCostEstimate(); persistCostSettings();
+    }
+
+    function setOutputPreset(preset) {
+      if (preset !== 'custom') state.costSettings.outputTokens = COST_PRESETS[preset];
+      state.costSettings.outputPreset = preset;
+      state.costSettings = normalizeCostSettings(state.costSettings);
+      syncCostControls();
+      renderCostComparison(currentAnalysis.tokenEstimate);
+      announceCostEstimate();
+      persistCostSettings();
+    }
+
+    function checkReasoning() {
+      const mission = state.mode === 'sandbox' ? null : currentMission();
+      document.querySelectorAll('.result-note').forEach(node => node.remove());
+      if (mission && mission.mode === 'predict') {
+        state.revealed[mission.id] = true;
+        renderAnalysis(currentAnalysis);
+        const selected = state.predictions[mission.id] || [];
+        const hits = mission.expected.filter(item => selected.includes(item));
+        const missed = mission.expected.filter(item => !selected.includes(item));
+        const extra = selected.filter(item => !mission.expected.includes(item));
+        const note = document.createElement('div'); note.className = 'result-note';
+        note.innerHTML = `<strong>${hits.length} of ${mission.expected.length} central risks identified.</strong><br>${missed.length ? `Consider: ${escapeHtml(missed.join('; '))}.` : 'You identified all central risks.'}${extra.length ? ` Your additional prediction is plausible but not central to this exercise: ${escapeHtml(extra.join('; '))}.` : ''}`;
+        document.querySelector('.prediction-grid').after(note);
+        if (hits.length === mission.expected.length && !state.completed.includes(mission.id)) state.completed.push(mission.id);
+      } else if (mission) {
+        const requiredMet = mission.required.filter(id => currentAnalysis.dimensions[id]).length;
+        const complete = currentAnalysis.readiness >= mission.target && requiredMet === mission.required.length;
+        state.best[mission.id] = Math.max(state.best[mission.id] || 0, currentAnalysis.readiness);
+        if (complete && !state.completed.includes(mission.id)) state.completed.push(mission.id);
+        const note = document.createElement('div'); note.className = 'result-note';
+        note.innerHTML = complete ? '<strong>Mission complete.</strong> Your prompt contains the required signals. Read it once for factual accuracy before using it.' : `<strong>Improving.</strong> ${requiredMet} of ${mission.required.length} mission signals are visible. Use the highest-priority coach finding for your next edit.`;
+        el('hint-box').before(note);
+      } else {
+        const note = document.createElement('div'); note.className = 'result-note';
+        note.innerHTML = `<strong>${band(currentAnalysis.readiness)} readiness.</strong> Review the visible evidence behind each finding; dismiss mentally anything that does not fit your real task.`;
+        el('hint-box').before(note);
+      }
+      updateProgress(); saveState();
+      el('live-status').textContent = mission && state.completed.includes(mission.id) ? 'Mission complete.' : `Readiness ${currentAnalysis.readiness}. Review the coach findings.`;
+    }
+
+    function revealHint() {
+      if (state.mode === 'sandbox') {
+        el('hint-box').innerHTML = '<strong>Sandbox reflection</strong><br>Ask: what decision would the model still have to invent from this request?';
+        el('hint-box').hidden = false; return;
+      }
+      const mission = currentMission();
+      const next = Math.min(3, state.hints[mission.id] || 0);
+      state.hints[mission.id] = Math.min(4, next + 1);
+      el('hint-box').innerHTML = `<strong>Hint ${next + 1} of 4</strong><br>${escapeHtml(mission.hints[next])}`;
+      el('hint-box').hidden = false; saveState();
+    }
+
+    function updateProgress() {
+      const count = state.completed.length;
+      el('journey-progress').value = count;
+      el('progress-text').textContent = `${count} / 12`;
+    }
+
+    function renderGuide() {
+      el('guide-cards').innerHTML = BLUEPRINT.map((item, index) => `<article class="card"><span class="card-num">0${index + 1} · ${item.origin}</span><h3>${item.name}</h3><p>${item.description}. Include it when it reduces a real ambiguity, not merely to increase a score.</p><button class="inline-btn" type="button" data-practice="${item.id}">Practice this signal →</button></article>`).join('');
+      document.querySelectorAll('[data-practice]').forEach(button => button.addEventListener('click', () => {
+        const mission = MISSIONS.find(candidate => candidate.mode !== 'predict' && candidate.required.includes(button.dataset.practice));
+        state.mode = mission.mode; state.currentId = mission.id; renderWorkspace(); saveState(); location.hash = 'lab';
+      }));
+    }
+
+    function exportProgress() {
+      const exportData = { schema: 1, exportedAt: new Date().toISOString(), completed: state.completed, best: state.best, hints: state.hints, predictions: state.predictions, costSettings: normalizeCostSettings(state.costSettings) };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'prompt-guide-progress.json'; link.click(); URL.revokeObjectURL(link.href);
+    }
+
+    async function importProgress(file) {
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (data.schema !== 1 || !Array.isArray(data.completed) || typeof data.best !== 'object' || data.best === null) throw new Error('Unsupported progress format');
+        const validIds = new Set(MISSIONS.map(mission => mission.id));
+        state.completed = data.completed.filter(id => validIds.has(id));
+        state.best = data.best;
+        state.hints = data.hints && typeof data.hints === 'object' ? data.hints : {};
+        state.predictions = data.predictions && typeof data.predictions === 'object' ? data.predictions : {};
+        const importedIds = Array.isArray(data.costSettings && data.costSettings.selectedModelIds) ? data.costSettings.selectedModelIds : [];
+        const knownIds = new Set([...MODEL_PRICING_CATALOG.map(entry => entry.id), 'custom']);
+        const unknownModels = importedIds.filter(id => !knownIds.has(id));
+        state.costSettings = normalizeCostSettings(data.costSettings);
+        syncCostControls(); saveState(); updateProgress(); renderWorkspace();
+        alert(`Prompt Guide progress imported. Draft prompts were not included.${unknownModels.length ? ` Unknown pricing profiles were removed: ${unknownModels.join(', ')}.` : ''}`);
+      } catch (error) {
+        alert('This file is not valid Prompt Guide progress data.');
+      } finally {
+        el('import-input').value = '';
+      }
+    }
+
+    function resetProgress() {
+      if (!confirm('Reset all Prompt Guide progress and drafts on this device?')) return;
+      state = defaultState(); syncCostControls(); saveState(); setMode('repair'); updateProgress();
+    }
+
+    document.querySelectorAll('.mode-tab').forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
+    missionSelect.addEventListener('change', () => { state.currentId = missionSelect.value; renderWorkspace(); saveState(); });
+    promptInput.addEventListener('input', () => updateAnalysis());
+    el('check-btn').addEventListener('click', checkReasoning);
+    el('hint-btn').addEventListener('click', revealHint);
+    el('reset-draft-btn').addEventListener('click', () => { const mission = state.mode === 'sandbox' ? null : currentMission(); promptInput.value = mission ? mission.starter : ''; state.drafts[state.currentId] = promptInput.value; renderModeControls(); updateAnalysis(); });
+    el('export-btn').addEventListener('click', exportProgress);
+    el('import-input').addEventListener('change', event => importProgress(event.target.files[0]));
+    el('reset-progress-btn').addEventListener('click', resetProgress);
+    document.querySelectorAll('[data-workload-setting]').forEach(input => input.addEventListener('change', updateCostSetting));
+    document.querySelectorAll('[data-custom-setting]').forEach(input => input.addEventListener('change', updateCustomProfile));
+    el('model-selectors').addEventListener('change', event => { if (event.target.matches('[data-model-slot]')) updateModelSelection(event); });
+    document.querySelectorAll('[data-output-preset]').forEach(button => button.addEventListener('click', () => setOutputPreset(button.dataset.outputPreset)));
+
+    renderGuide();
+    updateProgress();
+    syncCostControls();
+    setMode(state.mode);
+    window.PromptGuide = { analyzePrompt, estimateTokens, calculatePromptCost, calculateModelComparison, validatePricingCatalog, pricingCatalog: MODEL_PRICING_CATALOG, missions: MISSIONS };
+  </script>
+</body>
+</html>
