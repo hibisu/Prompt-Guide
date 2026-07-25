@@ -1,0 +1,3364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Optimizer Guide</title>
+  <style>
+
+    :root {
+      color-scheme: light;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --soft: #eef3f8;
+      --panel: #ffffff;
+      --page: #e3ebf2;
+      --alt: #d6e1ec;
+      --dark: #0b2438;
+      --navy: #0f2f4f;
+      --teal: #0e6f76;
+      --teal-strong: #0a585e;
+      --teal-bright: #4dd0d8;
+      --green: #1f6f43;
+      --green-strong: #16553a;
+      --amber: #8a5a00;
+      --orange: #9c3e00;
+      --red: #a8181c;
+      --blue: #1d4ed8;
+      --violet: #5b21b6;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --radius: 8px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--teal);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 20;
+      padding: 0.7rem 1rem;
+      background: var(--ink);
+      color: white;
+      border-radius: var(--radius);
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-width: 12rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 2.2rem;
+      height: 2.2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: white;
+      background: linear-gradient(135deg, var(--teal), var(--navy));
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.35rem;
+    }
+
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.2rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 650;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      background: var(--soft);
+      color: var(--navy);
+      outline: none;
+    }
+
+    main {
+      overflow: hidden;
+    }
+
+    .section {
+      padding: 4.5rem 1rem;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .section.alt {
+      background: var(--alt);
+    }
+
+    .section.dark {
+      color: #f8fafc;
+      background: var(--dark);
+    }
+
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 5rem 1rem 3.5rem;
+      background:
+        linear-gradient(120deg, rgba(11, 36, 56, 0.96), rgba(14, 111, 118, 0.92)),
+        linear-gradient(90deg, var(--dark), var(--teal));
+      color: #f8fafc;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.85fr);
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 2rem;
+      padding: 0.25rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 18ch;
+      margin-top: 1.2rem;
+      font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+      color: #ffffff;
+    }
+
+    .hero p {
+      max-width: 47rem;
+      margin: 1.2rem 0 0;
+      color: #e2ecf3;
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.65rem;
+      padding: 0.55rem 0.95rem;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: var(--navy);
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      background: #ffffff;
+      color: var(--navy);
+      border-color: var(--navy);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.65);
+    }
+
+    .btn.ghost:hover,
+    .btn.ghost:focus-visible {
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+    }
+
+    .token-flow {
+      min-height: 27rem;
+      padding: 1.1rem;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: var(--radius);
+      background: rgba(8, 23, 36, 0.45);
+      box-shadow: var(--shadow);
+    }
+
+    .flow-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: 1fr 4.5rem 1fr;
+      gap: 0.85rem;
+      align-items: center;
+    }
+
+    .flow-stack {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .flow-chip {
+      min-height: 2.35rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .flow-arrow {
+      position: relative;
+      height: 4rem;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    .flow-arrow::before {
+      content: "";
+      width: 100%;
+      height: 1.2rem;
+      background: #ffffff;
+      clip-path: polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%);
+    }
+
+    .flow-output {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .output-block {
+      min-height: 5.8rem;
+      display: grid;
+      place-items: center;
+      padding: 0.8rem;
+      border-radius: var(--radius);
+      background: #ffffff;
+      color: var(--navy);
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .mini-note {
+      margin-top: 1rem;
+      color: #cdd9e2;
+      font-size: 0.9rem;
+    }
+
+    .section-head {
+      max-width: 52rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-kicker {
+      color: var(--teal-strong);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .section h2 {
+      margin-top: 0.45rem;
+      font-size: clamp(1.9rem, 3vw, 3.05rem);
+      color: var(--navy);
+    }
+
+    .section.dark h2,
+    .section.dark h3 {
+      color: #ffffff;
+    }
+
+    .section.dark .section-kicker {
+      color: var(--teal-bright);
+    }
+
+    .section-head p,
+    .lead {
+      margin: 0.8rem 0 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .section.dark .lead,
+    .section.dark .section-head p {
+      color: #d4dde6;
+    }
+
+    .grid-3,
+    .grid-2,
+    .grid-4 {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card {
+      min-width: 0;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .card h3 {
+      color: var(--navy);
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      margin: 0.65rem 0 0;
+      color: var(--ink);
+    }
+
+    .card p + p {
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.55rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: #d6eef0;
+      color: var(--teal-strong);
+      font-size: 0.75rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .lane-card {
+      display: grid;
+      min-height: 22rem;
+      gap: 0.9rem;
+      align-content: start;
+    }
+
+    .lane-icon {
+      width: 3rem;
+      height: 3rem;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #dde9fb;
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+
+    .lane-card.cached .lane-icon {
+      background: #d5f0e0;
+      color: var(--green-strong);
+    }
+
+    .lane-card.output .lane-icon {
+      background: #fbe6c8;
+      color: var(--amber);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      min-height: 2.25rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: #ffffff;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .filter-btn[aria-pressed="true"] {
+      border-color: var(--teal-strong);
+      background: var(--teal-strong);
+      color: #ffffff;
+    }
+
+    .scenario-card {
+      min-height: 15rem;
+      display: grid;
+      align-content: start;
+      gap: 0.65rem;
+    }
+
+    .scenario-card[data-hidden="true"] {
+      display: none;
+    }
+
+    .score-layout {
+      display: grid;
+      grid-template-columns: minmax(18rem, 0.95fr) minmax(20rem, 1.05fr);
+      gap: 1.2rem;
+      align-items: start;
+      margin-bottom: 1.2rem;
+    }
+
+    .score-panel {
+      position: sticky;
+      top: 5.1rem;
+      min-height: 31rem;
+      padding: 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .score-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .score-name {
+      color: var(--navy);
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .score-value {
+      width: 6.5rem;
+      min-height: 4.8rem;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--navy);
+      font-size: 2.1rem;
+      font-weight: 950;
+    }
+
+    .meter {
+      height: 1rem;
+      margin: 1rem 0 0.8rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef3;
+    }
+
+    .meter span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      transition: width 0.2s ease, background 0.2s ease;
+    }
+
+    .score-band {
+      display: inline-flex;
+      min-height: 1.9rem;
+      align-items: center;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      font-weight: 900;
+      color: #ffffff;
+      background: var(--green);
+      letter-spacing: 0.03em;
+    }
+
+    .score-text {
+      min-height: 4.8rem;
+      margin: 0.85rem 0 0;
+      color: var(--ink);
+    }
+
+    .recommendations {
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .recommendations li {
+      min-height: 2.4rem;
+      padding: 0.6rem 0.75rem;
+      border-left: 4px solid var(--teal-strong);
+      border-radius: 6px;
+      background: #e2f0f2;
+      color: var(--ink);
+    }
+
+    /* Calculator */
+    .calc-grid, .calc-results {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .calc-panel {
+      padding: 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .calc-panel-head { margin-bottom: 0.8rem; }
+    .calc-panel-head h3 { margin: 0.2rem 0 0; color: var(--navy); font-size: 1.15rem; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.9rem; }
+    .preset-btn {
+      min-height: 2.1rem; padding: 0.3rem 0.7rem;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: #ffffff; color: var(--ink);
+      font-weight: 800; font-size: 0.85rem; cursor: pointer;
+    }
+    .preset-btn[aria-pressed="true"] {
+      background: var(--navy); color: #ffffff; border-color: var(--navy);
+    }
+    .calc-field { margin-bottom: 0.75rem; }
+    .calc-field label {
+      display: block; margin-bottom: 0.3rem;
+      color: var(--navy); font-weight: 800; font-size: 0.92rem;
+    }
+    .calc-field input[type="number"], .calc-field select {
+      width: 100%; min-height: 2.4rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid var(--line); border-radius: 7px;
+      background: #ffffff; color: var(--ink); font: inherit;
+    }
+    .calc-field small {
+      display: block; margin-top: 0.25rem;
+      color: var(--muted); font-size: 0.82rem;
+    }
+    .check-line { display: flex; align-items: center; gap: 0.55rem; color: var(--ink); font-weight: 700; }
+    .check-line input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--teal-strong); }
+    .model-tier { display: grid; gap: 0.7rem; }
+    .tier-block { padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: 7px; background: #f8fbfc; }
+    .tier-block h4 { margin: 0 0 0.45rem; color: var(--teal-strong); font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+    .model-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0; border-top: 1px solid #e1e8ee; font-size: 0.9rem; }
+    .model-row:first-of-type { border-top: 0; }
+    .model-row input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--teal-strong); }
+    .model-row .model-name { flex: 1 1 auto; color: var(--ink); font-weight: 700; }
+    .model-row .model-vendor { color: var(--muted); font-size: 0.78rem; }
+    .model-row .model-rate { color: var(--navy); font-weight: 800; font-size: 0.82rem; white-space: nowrap; }
+    .cost-cards { display: grid; gap: 0.6rem; }
+    .cost-card { display: grid; grid-template-columns: 1fr auto; gap: 0.4rem 0.8rem; padding: 0.7rem 0.85rem; border: 1px solid var(--line); border-radius: 7px; background: #ffffff; }
+    .cost-card.best { border-color: var(--teal-strong); background: #ecf6f7; }
+    .cost-card .cc-name { color: var(--navy); font-weight: 800; }
+    .cost-card .cc-meta { color: var(--muted); font-size: 0.8rem; }
+    .cost-card .cc-price { color: var(--navy); font-weight: 900; font-size: 1.15rem; text-align: right; }
+    .cost-card .cc-tag { grid-column: 1 / -1; align-self: start; width: max-content; padding: 0.15rem 0.45rem; border-radius: 999px; background: var(--teal-strong); color: #ffffff; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+    .legend { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.6rem; color: var(--ink); font-size: 0.82rem; font-weight: 700; }
+    .legend .sw { display: inline-block; width: 0.7rem; height: 0.7rem; margin-right: 0.3rem; border-radius: 2px; vertical-align: middle; }
+    .sw-input { background: #2b6cb0; }
+    .sw-cached { background: #16553a; }
+    .sw-output { background: #8a5a00; }
+    .cost-table { display: grid; gap: 0.55rem; }
+    .cost-row { padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 7px; background: #ffffff; }
+    .cost-row-head { display: flex; justify-content: space-between; gap: 0.6rem; align-items: baseline; margin-bottom: 0.4rem; }
+    .cost-row-head .name { color: var(--navy); font-weight: 800; }
+    .cost-row-head .turn { color: var(--muted); font-size: 0.82rem; }
+    .cost-bar { display: flex; height: 0.7rem; border-radius: 999px; overflow: hidden; background: #eef2f6; }
+    .cost-bar span { display: block; height: 100%; }
+    .cost-bar .b-input { background: #2b6cb0; }
+    .cost-bar .b-cached { background: #16553a; }
+    .cost-bar .b-output { background: #8a5a00; }
+    .cost-row-meta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.45rem; color: var(--ink); font-size: 0.82rem; }
+    .cost-row-meta b { color: var(--navy); }
+    .calc-reco { margin-top: 0.5rem; }
+    @media (max-width: 900px) { .calc-grid, .calc-results { grid-template-columns: 1fr; } }
+
+    /* Inline terminology tooltips */
+    .t-term {
+      position: relative;
+      display: inline;
+      border-bottom: 1px dotted var(--teal-strong);
+      cursor: help;
+      color: inherit;
+      font-weight: inherit;
+    }
+    .t-term:focus { outline: 2px solid var(--teal-bright); outline-offset: 2px; border-radius: 2px; }
+    .t-pop {
+      position: absolute;
+      bottom: calc(100% + 0.55rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      width: min(20rem, calc(100vw - 2rem));
+      padding: 0.75rem 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+      z-index: 50;
+      text-align: left;
+      font-weight: 400;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+    .t-pop::after {
+      content: "";
+      position: absolute;
+      bottom: -0.45rem;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 0.8rem;
+      height: 0.8rem;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+    .t-pop strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--navy);
+      font-size: 0.95rem;
+    }
+    .t-pop .t-label {
+      display: block;
+      margin-top: 0.45rem;
+      color: var(--teal-strong);
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .t-term:hover > .t-pop,
+    .t-term:focus > .t-pop,
+    .t-term:focus-within > .t-pop {
+      opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+    }
+
+    /* Score calculators (Bloat + Drift) */
+    .score-calc { margin-bottom: 1.4rem; }
+    .score-calc + .score-calc { margin-top: 0.4rem; }
+    .score-calc-head { margin-bottom: 0.9rem; }
+    .score-calc-head h3 { margin: 0.2rem 0 0.35rem; color: var(--navy); font-size: 1.35rem; }
+    .score-calc-head p { margin: 0; color: var(--muted); max-width: 60ch; }
+    .score-result-panel { display: flex; flex-direction: column; }
+    .score-pill {
+      display: inline-block; min-width: 2.6rem; padding: 0.1rem 0.55rem;
+      margin-left: 0.4rem; border-radius: 8px;
+      background: var(--navy); color: #ffffff;
+      font-weight: 900; font-size: 1.1rem; text-align: center; vertical-align: middle;
+    }
+    .score-bandline {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin: 0.2rem 0 0.8rem; flex-wrap: wrap;
+    }
+    .score-bandline .score-band {
+      display: inline-block; padding: 0.2rem 0.55rem;
+      border-radius: 999px; background: var(--green-strong); color: #ffffff;
+      font-size: 0.78rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .score-headline { color: var(--ink); font-weight: 600; font-size: 0.92rem; }
+    .score-stack {
+      display: flex; height: 0.9rem; border-radius: 999px;
+      overflow: hidden; background: #eef2f6;
+      margin: 0.2rem 0 0.9rem;
+    }
+    .score-stack span { display: block; height: 100%; }
+    .sw-files, .sw-clarity     { background: #1d4ed8; }
+    .sw-history, .sw-stale     { background: #0e6f76; }
+    .sw-tools, .sw-unrel       { background: #8a5a00; }
+    .sw-instr, .sw-goals       { background: #5b21b6; }
+    .sw-scope                  { background: #16553a; }
+    .sw-filler, .sw-conflict   { background: #a8181c; }
+    .sw-criteria               { background: #9c3e00; }
+    .score-breakdown { display: grid; gap: 0.5rem; margin-bottom: 0.9rem; }
+    .score-row {
+      padding: 0.55rem 0.7rem;
+      border: 1px solid var(--line); border-radius: 7px;
+      background: #ffffff;
+    }
+    .score-row-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 0.6rem; margin-bottom: 0.3rem;
+    }
+    .score-row-head .name { color: var(--navy); font-weight: 800; font-size: 0.92rem; }
+    .score-row-head .pts  { color: var(--navy); font-weight: 900; font-size: 0.95rem; white-space: nowrap; }
+    .score-bar {
+      height: 0.55rem; border-radius: 999px;
+      background: #eef2f6; overflow: hidden;
+    }
+    .score-bar span { display: block; height: 100%; }
+    .score-row-meta { margin-top: 0.35rem; color: var(--muted); font-size: 0.82rem; }
+    .score-row-meta b { color: var(--navy); }
+    .score-reco-title {
+      margin: 0.4rem 0 0.45rem;
+      color: var(--navy); font-size: 0.85rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .calc-field.check-line { display: flex; align-items: center; gap: 0.55rem; }
+    .calc-field.check-line label { display: inline; margin-bottom: 0; color: var(--ink); font-weight: 700; font-size: 0.9rem; }
+    .calc-field input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal-strong);
+    }
+
+    .control-panel {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .control {
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .control label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--navy);
+      font-weight: 850;
+    }
+
+    .control small {
+      display: block;
+      margin-top: 0.3rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin-top: 0.75rem;
+      accent-color: var(--teal);
+    }
+
+    select {
+      width: 100%;
+      min-height: 2.5rem;
+      margin-top: 0.75rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: white;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .switch-row input {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: var(--teal);
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .prompt-box {
+      min-height: 18rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .prompt-box.bad {
+      border: 1px solid #f1b5b5;
+      background: #fdf3f3;
+    }
+
+    .prompt-box.good {
+      border: 1px solid #b0e0c0;
+      background: #effaf2;
+    }
+
+    .prompt-label {
+      display: inline-flex;
+      min-height: 1.7rem;
+      align-items: center;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .prompt-label.bad {
+      background: var(--red);
+      color: #ffffff;
+    }
+
+    .prompt-label.good {
+      background: var(--green-strong);
+      color: #ffffff;
+    }
+
+    .prompt-box pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      margin: 0.75rem 0 0;
+      color: var(--ink);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .takeaway-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .takeaway {
+      min-height: 13rem;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.06);
+      color: #f8fafc;
+    }
+
+    .takeaway-num {
+      color: var(--teal-bright);
+      font-weight: 950;
+      letter-spacing: 0.03em;
+    }
+
+    .takeaway h3 {
+      margin-top: 0.45rem;
+      font-size: 1.1rem;
+    }
+
+    .takeaway p {
+      margin: 0.55rem 0 0;
+      color: #d4dde6;
+    }
+
+    footer {
+      padding: 2rem 1rem;
+      background: #06121d;
+      color: #d4dde6;
+    }
+
+    footer .wrap {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    footer a {
+      color: var(--teal-bright);
+    }
+
+    .fine-print {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .term-grid,
+      .score-layout,
+      .compare,
+      .takeaway-row {
+        grid-template-columns: 1fr;
+      }
+
+      .score-panel {
+        position: static;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .token-flow {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .section,
+      .hero {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+      }
+
+      .flow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-arrow {
+        height: 3rem;
+        transform: rotate(90deg);
+      }
+
+      .score-title-row,
+      .control label {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .score-value {
+        width: 100%;
+      }
+    }
+  
+
+    :root {
+      color-scheme: light;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --soft: #eef3f8;
+      --panel: #ffffff;
+      --page: #e3ebf2;
+      --alt: #d6e1ec;
+      --dark: #0b2438;
+      --navy: #0f2f4f;
+      --teal: #0e6f76;
+      --teal-strong: #0a585e;
+      --teal-bright: #4dd0d8;
+      --green: #1f6f43;
+      --green-strong: #16553a;
+      --amber: #8a5a00;
+      --orange: #9c3e00;
+      --red: #a8181c;
+      --blue: #1d4ed8;
+      --violet: #5b21b6;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --radius: 8px;
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+      line-height: 1.55;
+    }
+    a { color: var(--teal); }
+    .skip-link {
+      position: absolute; left: 1rem; top: -4rem; z-index: 20;
+      padding: 0.7rem 1rem; background: var(--ink); color: white;
+      border-radius: var(--radius); transition: top 0.2s ease;
+    }
+    .skip-link:focus { top: 1rem; }
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav {
+      max-width: var(--max); margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 0.7rem;
+      min-width: 12rem; font-weight: 800; color: var(--navy);
+    }
+    .brand-mark {
+      width: 2.2rem; height: 2.2rem;
+      display: grid; place-items: center;
+      border-radius: 7px; color: white;
+      background: linear-gradient(135deg, var(--teal), var(--navy));
+      font-weight: 900;
+    }
+    .nav-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
+    .nav-links a {
+      display: inline-flex; align-items: center;
+      min-height: 2.2rem; padding: 0.35rem 0.7rem;
+      border-radius: 7px;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.92rem; font-weight: 650;
+    }
+    .nav-links a:hover, .nav-links a:focus-visible {
+      background: var(--soft); color: var(--navy); outline: none;
+    }
+
+    .section { padding: 3.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel); }
+    .section.alt { background: var(--alt); }
+    .section.dark { color: #f8fafc; background: var(--dark); }
+    .wrap { max-width: var(--max); margin: 0 auto; }
+
+    .hero {
+      padding: 4.5rem 1rem 3rem;
+      background:
+        linear-gradient(120deg, rgba(11, 36, 56, 0.96), rgba(14, 111, 118, 0.92)),
+        linear-gradient(90deg, var(--dark), var(--teal));
+      color: #f8fafc;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      min-height: 2rem; padding: 0.25rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 999px;
+      color: #ffffff; background: rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h1 { margin-top: 1rem; font-size: clamp(2.2rem, 5vw, 3.6rem); color: #ffffff; max-width: 22ch; }
+    .hero p { max-width: 50rem; margin: 1.2rem 0 0; color: #e2ecf3; font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 2.65rem; padding: 0.55rem 0.95rem;
+      border: 1px solid transparent; border-radius: 7px;
+      background: var(--navy); color: white; text-decoration: none;
+      font-weight: 800; cursor: pointer;
+    }
+    .btn.secondary { background: #ffffff; color: var(--navy); border-color: var(--navy); }
+    .btn.ghost { background: transparent; color: #ffffff; border-color: rgba(255, 255, 255, 0.65); }
+    .btn.ghost:hover, .btn.ghost:focus-visible { background: rgba(255, 255, 255, 0.12); outline: none; }
+
+    .section-head { margin-bottom: 1.6rem; }
+    .section-head h2 { color: var(--navy); font-size: clamp(1.5rem, 3vw, 2.1rem); }
+    .section-head p { max-width: 65ch; color: var(--muted); margin: 0.5rem 0 0; }
+    .section-kicker {
+      display: inline-block; padding: 0.15rem 0.55rem;
+      border-radius: 999px; background: var(--soft); color: var(--teal-strong);
+      font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* Component cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card {
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .card h3 { color: var(--navy); font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .card .lead { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
+    .card .formula {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      background: var(--soft);
+      color: var(--navy);
+      font-family: Consolas, Menlo, monospace;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    .card.amber { border-left: 4px solid var(--amber); }
+    .card.green { border-left: 4px solid var(--green-strong); }
+    .card.red   { border-left: 4px solid var(--red); }
+    .card.blue  { border-left: 4px solid var(--blue); }
+    .card.violet{ border-left: 4px solid var(--violet); }
+    .card.teal  { border-left: 4px solid var(--teal-strong); }
+
+    /* Formula table */
+    table.formula-table {
+      width: 100%; border-collapse: collapse; margin-top: 0.8rem;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+    }
+    table.formula-table th, table.formula-table td {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top; text-align: left;
+    }
+    table.formula-table th {
+      background: var(--soft); color: var(--navy);
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    table.formula-table td:first-child { color: var(--navy); font-weight: 800; }
+    table.formula-table td.weight { color: var(--teal-strong); font-family: Consolas, Menlo, monospace; font-weight: 800; white-space: nowrap; }
+    table.formula-table tr:last-child td { border-bottom: 0; }
+
+    /* Examples */
+    .example {
+      padding: 1.2rem 1.3rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel); margin-bottom: 1rem;
+    }
+    .example-head {
+      display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+    .example-head h3 { color: var(--navy); font-size: 1.1rem; margin: 0; }
+    .ex-pill {
+      display: inline-block; padding: 0.15rem 0.55rem;
+      border-radius: 999px; color: #ffffff;
+      font-size: 0.72rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .ex-low      { background: var(--green-strong); }
+    .ex-medium   { background: var(--amber); }
+    .ex-high     { background: var(--orange); }
+    .ex-critical { background: var(--red); }
+    .ex-prompt {
+      padding: 0.7rem 0.9rem; margin: 0.4rem 0 0.7rem;
+      border-left: 4px solid var(--teal-strong);
+      background: var(--soft); color: var(--ink);
+      border-radius: 0 6px 6px 0;
+    }
+    .ex-stack { display: flex; height: 0.85rem; border-radius: 999px; overflow: hidden; background: #eef2f6; margin-bottom: 0.6rem; }
+    .ex-stack span { display: block; height: 100%; }
+    .sw-files   { background: #1d4ed8; }
+    .sw-history { background: #0e6f76; }
+    .sw-tools   { background: #8a5a00; }
+    .sw-instr   { background: #5b21b6; }
+    .sw-scope   { background: #16553a; }
+    .sw-filler  { background: #a8181c; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.6rem; color: var(--ink); font-size: 0.82rem; font-weight: 700; }
+    .legend i {
+      display: inline-block; width: 0.7rem; height: 0.7rem;
+      margin-right: 0.3rem; border-radius: 2px; vertical-align: middle;
+    }
+
+    .ex-rows { display: grid; gap: 0.4rem; }
+    .ex-row {
+      display: grid;
+      grid-template-columns: minmax(11rem, 0.9fr) minmax(0, 1.6fr) auto;
+      gap: 0.6rem; align-items: center;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--line); border-radius: 7px; background: #ffffff;
+    }
+    .ex-row .name { color: var(--navy); font-weight: 800; font-size: 0.9rem; }
+    .ex-row .pts  { color: var(--navy); font-weight: 900; font-size: 0.92rem; white-space: nowrap; }
+    .ex-bar { height: 0.45rem; border-radius: 999px; background: #eef2f6; overflow: hidden; }
+    .ex-bar span { display: block; height: 100%; }
+    .ex-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-top: 0.6rem; padding-top: 0.55rem;
+      border-top: 1px dashed var(--line);
+    }
+    .ex-total .label { color: var(--muted); font-weight: 700; font-size: 0.9rem; }
+    .ex-total .total { color: var(--navy); font-weight: 900; font-size: 1.4rem; }
+    .ex-takeaway { margin: 0.6rem 0 0; color: var(--ink); font-size: 0.92rem; }
+
+    /* Anti-patterns */
+    .ap {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8rem;
+      padding: 1rem 1.1rem; margin-bottom: 0.8rem;
+      border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel);
+    }
+    .ap h4 { margin: 0 0 0.3rem; color: var(--navy); font-size: 0.95rem; }
+    .ap .bad, .ap .good {
+      padding: 0.7rem 0.8rem; border-radius: 6px; font-size: 0.92rem;
+    }
+    .ap .bad  { background: #fde7e9; border-left: 4px solid var(--red); }
+    .ap .good { background: #e2f0f2; border-left: 4px solid var(--teal-strong); }
+    .ap .tag { display: inline-block; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+    .ap .bad  .tag { color: var(--red); }
+    .ap .good .tag { color: var(--teal-strong); }
+
+    /* Bands */
+    .bands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.7rem; }
+    .band-card {
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius); color: #ffffff;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .band-card .range { font-size: 0.8rem; font-weight: 900; opacity: 0.92; text-transform: uppercase; letter-spacing: 0.04em; }
+    .band-card .name  { font-size: 1.4rem; font-weight: 900; margin: 0.2rem 0 0.4rem; }
+    .band-card .desc  { margin: 0; font-size: 0.9rem; }
+    .band-low      { background: var(--green-strong); }
+    .band-medium   { background: var(--amber); }
+    .band-high     { background: var(--orange); }
+    .band-critical { background: var(--red); }
+
+    /* Checklist */
+    .checklist { display: grid; gap: 0.5rem; padding: 0; margin: 0; list-style: none; }
+    .checklist li {
+      padding: 0.6rem 0.85rem 0.6rem 2.2rem;
+      position: relative;
+      border: 1px solid var(--line); border-radius: 7px; background: var(--panel);
+      color: var(--ink); font-size: 0.92rem;
+    }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+      width: 1.2rem; height: 1.2rem; border-radius: 4px;
+      background: var(--green-strong); color: #ffffff;
+      display: grid; place-items: center; font-weight: 900; font-size: 0.78rem;
+    }
+
+    /* FAQ */
+    details {
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel); margin-bottom: 0.6rem;
+    }
+    details + details { margin-top: 0; }
+    details summary {
+      cursor: pointer; color: var(--navy); font-weight: 800;
+      list-style: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after { content: " +"; color: var(--teal-strong); font-weight: 900; }
+    details[open] summary::after { content: " \2212"; }
+    details p { margin: 0.5rem 0 0; color: var(--ink); }
+
+    footer {
+      padding: 2.5rem 1rem; background: var(--dark); color: #cbd5e1;
+    }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; }
+    footer a { color: #ffffff; }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3, .bands { grid-template-columns: 1fr; }
+      .ap { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .ex-row { grid-template-columns: 1fr; }
+      .ex-row .pts { text-align: left; }
+    }
+  
+
+    :root {
+      color-scheme: light;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --soft: #eef3f8;
+      --panel: #ffffff;
+      --page: #e3ebf2;
+      --alt: #d6e1ec;
+      --dark: #0b2438;
+      --navy: #0f2f4f;
+      --teal: #0e6f76;
+      --teal-strong: #0a585e;
+      --teal-bright: #4dd0d8;
+      --green: #1f6f43;
+      --green-strong: #16553a;
+      --amber: #8a5a00;
+      --orange: #9c3e00;
+      --red: #a8181c;
+      --blue: #1d4ed8;
+      --violet: #5b21b6;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --radius: 8px;
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+      line-height: 1.55;
+    }
+    a { color: var(--teal); }
+    .skip-link {
+      position: absolute; left: 1rem; top: -4rem; z-index: 20;
+      padding: 0.7rem 1rem; background: var(--ink); color: white;
+      border-radius: var(--radius); transition: top 0.2s ease;
+    }
+    .skip-link:focus { top: 1rem; }
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav {
+      max-width: var(--max); margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 0.7rem;
+      min-width: 12rem; font-weight: 800; color: var(--navy);
+    }
+    .brand-mark {
+      width: 2.2rem; height: 2.2rem;
+      display: grid; place-items: center;
+      border-radius: 7px; color: white;
+      background: linear-gradient(135deg, var(--teal), var(--navy));
+      font-weight: 900;
+    }
+    .nav-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
+    .nav-links a {
+      display: inline-flex; align-items: center;
+      min-height: 2.2rem; padding: 0.35rem 0.7rem;
+      border-radius: 7px;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.92rem; font-weight: 650;
+    }
+    .nav-links a:hover, .nav-links a:focus-visible {
+      background: var(--soft); color: var(--navy); outline: none;
+    }
+
+    .section { padding: 3.5rem 1rem; border-bottom: 1px solid var(--line); background: var(--panel); }
+    .section.alt { background: var(--alt); }
+    .section.dark { color: #f8fafc; background: var(--dark); }
+    .wrap { max-width: var(--max); margin: 0 auto; }
+
+    .hero {
+      padding: 4.5rem 1rem 3rem;
+      background:
+        linear-gradient(120deg, rgba(11, 36, 56, 0.96), rgba(91, 33, 182, 0.86)),
+        linear-gradient(90deg, var(--dark), var(--violet));
+      color: #f8fafc;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      min-height: 2rem; padding: 0.25rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 999px;
+      color: #ffffff; background: rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h1 { margin-top: 1rem; font-size: clamp(2.2rem, 5vw, 3.6rem); color: #ffffff; max-width: 22ch; }
+    .hero p { max-width: 50rem; margin: 1.2rem 0 0; color: #e2ecf3; font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 2.65rem; padding: 0.55rem 0.95rem;
+      border: 1px solid transparent; border-radius: 7px;
+      background: var(--navy); color: white; text-decoration: none;
+      font-weight: 800; cursor: pointer;
+    }
+    .btn.secondary { background: #ffffff; color: var(--navy); border-color: var(--navy); }
+    .btn.ghost { background: transparent; color: #ffffff; border-color: rgba(255, 255, 255, 0.65); }
+    .btn.ghost:hover, .btn.ghost:focus-visible { background: rgba(255, 255, 255, 0.12); outline: none; }
+
+    .section-head { margin-bottom: 1.6rem; }
+    .section-head h2 { color: var(--navy); font-size: clamp(1.5rem, 3vw, 2.1rem); }
+    .section-head p { max-width: 65ch; color: var(--muted); margin: 0.5rem 0 0; }
+    .section-kicker {
+      display: inline-block; padding: 0.15rem 0.55rem;
+      border-radius: 999px; background: var(--soft); color: var(--teal-strong);
+      font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card {
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .card h3 { color: var(--navy); font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .card .lead { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
+    .card.amber { border-left: 4px solid var(--amber); }
+    .card.green { border-left: 4px solid var(--green-strong); }
+    .card.red   { border-left: 4px solid var(--red); }
+    .card.blue  { border-left: 4px solid var(--blue); }
+    .card.violet{ border-left: 4px solid var(--violet); }
+    .card.teal  { border-left: 4px solid var(--teal-strong); }
+
+    /* Formula table */
+    table.formula-table {
+      width: 100%; border-collapse: collapse; margin-top: 0.8rem;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+    }
+    table.formula-table th, table.formula-table td {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top; text-align: left;
+    }
+    table.formula-table th {
+      background: var(--soft); color: var(--navy);
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    table.formula-table td:first-child { color: var(--navy); font-weight: 800; }
+    table.formula-table td.weight { color: var(--teal-strong); font-family: Consolas, Menlo, monospace; font-weight: 800; white-space: nowrap; }
+    table.formula-table tr:last-child td { border-bottom: 0; }
+
+    /* Examples */
+    .example {
+      padding: 1.2rem 1.3rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel); margin-bottom: 1rem;
+    }
+    .example-head {
+      display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+    .example-head h3 { color: var(--navy); font-size: 1.1rem; margin: 0; }
+    .ex-pill {
+      display: inline-block; padding: 0.15rem 0.55rem;
+      border-radius: 999px; color: #ffffff;
+      font-size: 0.72rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .ex-low      { background: var(--green-strong); }
+    .ex-medium   { background: var(--amber); }
+    .ex-high     { background: var(--orange); }
+    .ex-critical { background: var(--red); }
+    .ex-prompt {
+      padding: 0.7rem 0.9rem; margin: 0.4rem 0 0.7rem;
+      border-left: 4px solid var(--teal-strong);
+      background: var(--soft); color: var(--ink);
+      border-radius: 0 6px 6px 0;
+    }
+    .ex-stack { display: flex; height: 0.85rem; border-radius: 999px; overflow: hidden; background: #eef2f6; margin-bottom: 0.6rem; }
+    .ex-stack span { display: block; height: 100%; }
+
+    /* Drift component swatches */
+    .sw-clarity  { background: #1d4ed8; }
+    .sw-stale    { background: #0e6f76; }
+    .sw-goals    { background: #5b21b6; }
+    .sw-unrel    { background: #8a5a00; }
+    .sw-conflict { background: #a8181c; }
+    .sw-criteria { background: #9c3e00; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 0.6rem; color: var(--ink); font-size: 0.82rem; font-weight: 700; }
+    .legend i {
+      display: inline-block; width: 0.7rem; height: 0.7rem;
+      margin-right: 0.3rem; border-radius: 2px; vertical-align: middle;
+    }
+
+    .ex-rows { display: grid; gap: 0.4rem; }
+    .ex-row {
+      display: grid;
+      grid-template-columns: minmax(11rem, 0.9fr) minmax(0, 1.6fr) auto;
+      gap: 0.6rem; align-items: center;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--line); border-radius: 7px; background: #ffffff;
+    }
+    .ex-row .name { color: var(--navy); font-weight: 800; font-size: 0.9rem; }
+    .ex-row .pts  { color: var(--navy); font-weight: 900; font-size: 0.92rem; white-space: nowrap; }
+    .ex-bar { height: 0.45rem; border-radius: 999px; background: #eef2f6; overflow: hidden; }
+    .ex-bar span { display: block; height: 100%; }
+    .ex-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-top: 0.6rem; padding-top: 0.55rem;
+      border-top: 1px dashed var(--line);
+    }
+    .ex-total .label { color: var(--muted); font-weight: 700; font-size: 0.9rem; }
+    .ex-total .total { color: var(--navy); font-weight: 900; font-size: 1.4rem; }
+    .ex-takeaway { margin: 0.6rem 0 0; color: var(--ink); font-size: 0.92rem; }
+
+    /* Anti-patterns */
+    .ap {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8rem;
+      padding: 1rem 1.1rem; margin-bottom: 0.8rem;
+      border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel);
+    }
+    .ap h4 { margin: 0 0 0.3rem; color: var(--navy); font-size: 0.95rem; }
+    .ap .bad, .ap .good {
+      padding: 0.7rem 0.8rem; border-radius: 6px; font-size: 0.92rem;
+    }
+    .ap .bad  { background: #fde7e9; border-left: 4px solid var(--red); }
+    .ap .good { background: #e2f0f2; border-left: 4px solid var(--teal-strong); }
+    .ap .tag { display: inline-block; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+    .ap .bad  .tag { color: var(--red); }
+    .ap .good .tag { color: var(--teal-strong); }
+
+    /* Bands */
+    .bands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.7rem; }
+    .band-card {
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius); color: #ffffff;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+    .band-card .range { font-size: 0.8rem; font-weight: 900; opacity: 0.92; text-transform: uppercase; letter-spacing: 0.04em; }
+    .band-card .name  { font-size: 1.4rem; font-weight: 900; margin: 0.2rem 0 0.4rem; }
+    .band-card .desc  { margin: 0; font-size: 0.9rem; }
+    .band-low      { background: var(--green-strong); }
+    .band-medium   { background: var(--amber); }
+    .band-high     { background: var(--orange); }
+    .band-critical { background: var(--red); }
+
+    /* Checklist */
+    .checklist { display: grid; gap: 0.5rem; padding: 0; margin: 0; list-style: none; }
+    .checklist li {
+      padding: 0.6rem 0.85rem 0.6rem 2.2rem;
+      position: relative;
+      border: 1px solid var(--line); border-radius: 7px; background: var(--panel);
+      color: var(--ink); font-size: 0.92rem;
+    }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+      width: 1.2rem; height: 1.2rem; border-radius: 4px;
+      background: var(--green-strong); color: #ffffff;
+      display: grid; place-items: center; font-weight: 900; font-size: 0.78rem;
+    }
+
+    /* FAQ */
+    details {
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--panel); margin-bottom: 0.6rem;
+    }
+    details summary {
+      cursor: pointer; color: var(--navy); font-weight: 800;
+      list-style: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after { content: " +"; color: var(--teal-strong); font-weight: 900; }
+    details[open] summary::after { content: " \2212"; }
+    details p { margin: 0.5rem 0 0; color: var(--ink); }
+
+    footer {
+      padding: 2.5rem 1rem; background: var(--dark); color: #cbd5e1;
+    }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; }
+    footer a { color: #ffffff; }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3, .bands { grid-template-columns: 1fr; }
+      .ap { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .ex-row { grid-template-columns: 1fr; }
+      .ex-row .pts { text-align: left; }
+    }
+  
+
+    /* Tab nav for combined guide */
+    .tab-nav { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .tab-nav a {
+      display: inline-flex; align-items: center;
+      min-height: 2.2rem; padding: 0.35rem 0.85rem;
+      border: 1px solid transparent; border-radius: 999px;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.92rem; font-weight: 800;
+      cursor: pointer;
+    }
+    .tab-nav a:hover, .tab-nav a:focus-visible {
+      background: var(--soft); color: var(--navy); outline: none;
+    }
+    .tab-nav a[data-active="true"] {
+      background: var(--navy); color: #ffffff; border-color: var(--navy);
+    }
+    body[data-view="overview"] #view-overview,
+    body[data-view="bloat"] #view-bloat,
+    body[data-view="drift"] #view-drift { display: block; }
+    body[data-view="overview"] #view-bloat,
+    body[data-view="overview"] #view-drift,
+    body[data-view="bloat"] #view-overview,
+    body[data-view="bloat"] #view-drift,
+    body[data-view="drift"] #view-overview,
+    body[data-view="drift"] #view-bloat { display: none !important; }
+  </style>
+</head>
+<body data-view="overview">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <div class="brand"><span class="brand-mark">TO</span><span>Token Optimizer</span></div>
+      <div class="tab-nav" role="tablist" aria-label="Guide views">
+        <a href="#" data-tab="overview" role="tab" aria-selected="true" data-active="true">Overview</a>
+        <a href="#bloat" data-tab="bloat" role="tab" aria-selected="false">Bloat Score guide</a>
+        <a href="#drift" data-tab="drift" role="tab" aria-selected="false">AI Drift Score guide</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="view" id="view-overview" role="tabpanel" aria-label="Overview">
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow">Beginner's guide</span>
+          <h1 id="hero-title">Make every token earn its place.</h1>
+          <p>AI assistants do not only read the words you type. They also receive instructions, chat history, files, tool descriptions, and sometimes extra reasoning work. This page explains the moving parts in plain language and helps you spot where cost, noise, and drift can enter the workflow.</p>
+          <div class="hero-actions">
+            <a class="btn secondary" href="#scores">Check scores</a>
+            <a class="btn ghost" href="#calculator">Open calculator</a>
+          </div>
+        </div>
+        <div class="token-flow" aria-label="Token flow diagram">
+          <div class="flow-title"><span>What the model receives</span><span>What you pay for</span></div>
+          <div class="flow-grid">
+            <div class="flow-stack">
+              <div class="flow-chip">System instructions</div>
+              <div class="flow-chip">Custom instructions</div>
+              <div class="flow-chip">Tools and MCP schemas</div>
+              <div class="flow-chip">Chat history</div>
+              <div class="flow-chip">Retrieved files</div>
+              <div class="flow-chip">Your prompt</div>
+            </div>
+            <div class="flow-arrow" aria-hidden="true"></div>
+            <div class="flow-output">
+              <div class="output-block">Input tokens</div>
+              <div class="output-block">Cached tokens</div>
+              <div class="output-block">Output tokens</div>
+            </div>
+          </div>
+          <p class="mini-note">The prompt you type is often the smallest part. The biggest savings usually come from scoping context, keeping reusable instructions stable, and controlling output size.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="token-lanes" class="section" aria-labelledby="lanes-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Token economy</span>
+          <h2 id="lanes-title">Three token lanes, three cost behaviors</h2>
+          <p>Every AI turn is usually made of input, cached input, and output. Each lane has a different optimization lever.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card lane-card">
+            <div class="lane-icon">IN</div>
+            <span class="tag">Billed every turn</span>
+            <h3>Input tokens</h3>
+            <p>These are the words, code, files, instructions, tool descriptions, and chat history sent to the model before it answers.</p>
+            <p><strong>Beginner action:</strong> attach the smallest useful file, function, or selection instead of the whole repo.</p>
+          </article>
+          <article class="card lane-card cached">
+            <div class="lane-icon">CA</div>
+            <span class="tag">Discounted when stable</span>
+            <h3>Cached tokens</h3>
+            <p>Repeated instructions or prefixes may be cheaper when they stay byte-identical across turns.</p>
+            <p><strong>Beginner action:</strong> keep shared instructions short, stable, and reusable instead of pasting a new version every time.</p>
+          </article>
+          <article class="card lane-card output">
+            <div class="lane-icon">OUT</div>
+            <span class="tag">Often highest cost</span>
+            <h3>Output tokens</h3>
+            <p>These are the visible answer and the extra work the model may do to reason through the response.</p>
+            <p><strong>Beginner action:</strong> ask for the format you need, such as a short answer, table, patch, or 3 bullet summary.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenarios" class="section" aria-labelledby="scenarios-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Context rot scenarios</span>
+          <h2 id="scenarios-title">Common ways token waste appears</h2>
+          <p>Filter the scenarios by category. Each card explains the beginner risk and the practical fix.</p>
+        </div>
+        <div class="filter-row" role="toolbar" aria-label="Scenario filters">
+          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter-btn" type="button" data-filter="context" aria-pressed="false">Context</button>
+          <button class="filter-btn" type="button" data-filter="prompt" aria-pressed="false">Prompt</button>
+          <button class="filter-btn" type="button" data-filter="output" aria-pressed="false">Output</button>
+          <button class="filter-btn" type="button" data-filter="model" aria-pressed="false">Model</button>
+          <button class="filter-btn" type="button" data-filter="reasoning" aria-pressed="false">Reasoning</button>
+          <button class="filter-btn" type="button" data-filter="tools" aria-pressed="false">Tools</button>
+          <button class="filter-btn" type="button" data-filter="governance" aria-pressed="false">Governance</button>
+        </div>
+        <div class="grid-3" id="scenarioGrid">
+          <article class="card scenario-card" data-category="context"><span class="tag">Context</span><h3>Whole-file reads</h3><p>Asking the model to inspect a broad folder can load thousands of tokens for a one-function problem.</p><p><strong>Fix:</strong> attach the exact file, function, or selected lines first.</p></article>
+          <article class="card scenario-card" data-category="prompt"><span class="tag">Prompt</span><h3>Prompt compaction</h3><p>Polite filler and setup sentences are billed like useful instructions.</p><p><strong>Fix:</strong> state task, scope, constraints, and desired output directly.</p></article>
+          <article class="card scenario-card" data-category="prompt"><span class="tag">Prompt</span><h3>Code-native phrasing</h3><p>A type signature or error message can say more than a long paragraph.</p><p><strong>Fix:</strong> include concrete code, exact errors, or expected behavior.</p></article>
+          <article class="card scenario-card" data-category="output"><span class="tag">Output</span><h3>Output control</h3><p>Long answers consume more tokens, especially when you only need a patch or summary.</p><p><strong>Fix:</strong> ask for the smallest useful output format.</p></article>
+          <article class="card scenario-card" data-category="model"><span class="tag">Model</span><h3>Model routing</h3><p>Using a frontier model for routine edits can cost more than the task deserves.</p><p><strong>Fix:</strong> use Auto Mode or a lighter model for simple work.</p></article>
+          <article class="card scenario-card" data-category="reasoning"><span class="tag">Reasoning</span><h3>Reasoning-depth control</h3><p>Maximum reasoning on a typo or formatting issue can multiply spend.</p><p><strong>Fix:</strong> reserve high reasoning for genuinely hard ambiguity.</p></article>
+          <article class="card scenario-card" data-category="context"><span class="tag">Caching</span><h3>Instruction cache discount</h3><p>A stable prefix can be reused more cheaply, but constant edits break the benefit.</p><p><strong>Fix:</strong> keep shared instructions byte-stable when possible.</p></article>
+          <article class="card scenario-card" data-category="context"><span class="tag">Sessions</span><h3>Session lifecycle</h3><p>By late turns, history can become a large share of what the model reads.</p><p><strong>Fix:</strong> start fresh, compact, or summarize when switching tasks.</p></article>
+          <article class="card scenario-card" data-category="tools"><span class="tag">Tools</span><h3>MCP schema tax</h3><p>Every enabled tool may add schema text to repeated agent steps.</p><p><strong>Fix:</strong> audit tools and keep only the useful set enabled.</p></article>
+          <article class="card scenario-card" data-category="tools"><span class="tag">Tools</span><h3>Subagent boundary</h3><p>A helper can read lots of material while the parent chat receives only a summary.</p><p><strong>Fix:</strong> use subagents for broad exploration and keep main context focused.</p></article>
+          <article class="card scenario-card" data-category="governance"><span class="tag">Governance</span><h3>AGENTS.md noise</h3><p>An auto-generated agent file can become an encyclopedia instead of a guide.</p><p><strong>Fix:</strong> keep non-obvious risks, constraints, and workflow rules only.</p></article>
+          <article class="card scenario-card" data-category="model"><span class="tag">Model</span><h3>Ask, Plan, Agent</h3><p>Agent mode can take many steps, so vague prompts can become expensive quickly.</p><p><strong>Fix:</strong> use Ask for quick answers, Plan for design, Agent for scoped implementation.</p></article>
+          <article class="card scenario-card" data-category="governance"><span class="tag">Governance</span><h3>Three-layer budget</h3><p>Personal habits help, but team policies stop organization-wide runaway spend.</p><p><strong>Fix:</strong> define defaults, alerts, caps, and exception paths.</p></article>
+          <article class="card scenario-card" data-category="prompt"><span class="tag">Prompt</span><h3>Language tax</h3><p>Some languages can take more tokens than English for the same technical request.</p><p><strong>Fix:</strong> use English for technical prompts when it is appropriate for the team.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="scores" class="section alt" aria-labelledby="scores-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Interactive checks</span>
+          <h2 id="scores-title">Bloat Score and AI Drift Score</h2>
+          <p>These are illustrative education scores, not official billing metrics. They help you reason about whether a prompt is focused and whether the assistant may drift away from the intended task. <a href="#" data-view="bloat">Read the in-depth Bloat Score guide &rarr;</a> &middot; <a href="#" data-view="drift">Read the in-depth AI Drift Score guide &rarr;</a></p>
+        </div>
+
+        <article class="score-calc" id="bloat-score">
+          <header class="score-calc-head">
+            <span class="section-kicker">Bloat Score</span>
+            <h3>How much extra context is riding along?</h3>
+            <p>Bloat is unnecessary input tokens &mdash; files, tools, history, and always-on rules the model does not need for the current task. High bloat wastes spend and crowds out the real ask.</p>
+          </header>
+          <div class="calc-grid">
+            <div class="calc-panel">
+              <div class="calc-panel-head"><span class="section-kicker">Scenario</span><h3>Inputs</h3></div>
+              <div class="preset-row" id="bloatPresets" role="toolbar" aria-label="Bloat presets">
+                <button class="preset-btn" type="button" data-bp="lean">Lean prompt</button>
+                <button class="preset-btn" type="button" data-bp="daily" aria-pressed="true">Daily work</button>
+                <button class="preset-btn" type="button" data-bp="agent">Heavy agent</button>
+                <button class="preset-btn" type="button" data-bp="kitchen">Kitchen sink</button>
+              </div>
+              <div class="calc-field"><label for="filesAttached">Files attached: <span id="filesAttachedOut">3</span></label><input id="filesAttached" type="range" min="0" max="20" value="3"><small>Each attached file is re-sent on every turn until removed.</small></div>
+              <div class="calc-field"><label for="chatTurns">Chat turns carried forward: <span id="chatTurnsOut">6</span></label><input id="chatTurns" type="range" min="0" max="40" value="6"><small>Older turns get replayed verbatim until you reset or compact.</small></div>
+              <div class="calc-field"><label for="enabledTools">Enabled tools: <span id="enabledToolsOut">8</span></label><input id="enabledTools" type="range" min="0" max="80" value="8"><small>Every enabled tool ships its JSON schema in the prompt.</small></div>
+              <div class="calc-field"><label for="instructionLength">Always-on instructions</label><select id="instructionLength"><option value="0">Tiny: under 50 lines</option><option value="8" selected>Healthy: 50&ndash;200 lines</option><option value="18">Large: 200&ndash;500 lines</option><option value="28">Huge: over 500 lines</option></select><small>Project + user + org rules ride on every turn.</small></div>
+              <div class="calc-field"><label for="scopeType">Scope precision</label><select id="scopeType"><option value="0">Exact selection / function</option><option value="8" selected>Specific file</option><option value="18">Folder or feature area</option><option value="28">Whole codebase</option></select><small>Narrower scope cuts the most tokens for the least effort.</small></div>
+              <div class="calc-field check-line"><input id="hasFiller" type="checkbox"><label for="hasFiller">Prompt has filler text (long intros, apologies, off-topic background)</label></div>
+            </div>
+
+            <div class="calc-panel score-result-panel" aria-live="polite">
+              <div class="calc-panel-head"><span class="section-kicker">Result</span><h3>Bloat Score <span class="score-pill" id="bloatValue">0</span></h3></div>
+              <div class="score-bandline"><span class="score-band" id="bloatBand">Low</span><span class="score-headline" id="bloatText"></span></div>
+              <div class="legend">
+                <span><i class="sw sw-files"></i>Files</span>
+                <span><i class="sw sw-history"></i>History</span>
+                <span><i class="sw sw-tools"></i>Tools</span>
+                <span><i class="sw sw-instr"></i>Instructions</span>
+                <span><i class="sw sw-scope"></i>Scope</span>
+                <span><i class="sw sw-filler"></i>Filler</span>
+              </div>
+              <div class="score-stack" id="bloatStack" aria-hidden="true"></div>
+              <div class="score-breakdown" id="bloatBreakdown"></div>
+              <h4 class="score-reco-title">What to fix first</h4>
+              <ul class="recommendations" id="bloatRecommendations"></ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="score-calc" id="drift-score">
+          <header class="score-calc-head">
+            <span class="section-kicker">AI Drift Score</span>
+            <h3>How likely is the answer to wander away from the real task?</h3>
+            <p>Drift is the chance the assistant follows stale history, a side goal, or an irrelevant file instead of the actual outcome you wanted. High drift produces confident but off-target answers.</p>
+          </header>
+          <div class="calc-grid">
+            <div class="calc-panel">
+              <div class="calc-panel-head"><span class="section-kicker">Scenario</span><h3>Inputs</h3></div>
+              <div class="preset-row" id="driftPresets" role="toolbar" aria-label="Drift presets">
+                <button class="preset-btn" type="button" data-dp="focused">Focused ask</button>
+                <button class="preset-btn" type="button" data-dp="mixed" aria-pressed="true">Mixed session</button>
+                <button class="preset-btn" type="button" data-dp="vague">Vague request</button>
+                <button class="preset-btn" type="button" data-dp="risky">Conflicting / risky</button>
+              </div>
+              <div class="calc-field"><label for="clarity">Task clarity (0&ndash;10): <span id="clarityOut">7</span></label><input id="clarity" type="range" min="0" max="10" value="7"><small>Higher = the desired outcome is easy to understand.</small></div>
+              <div class="calc-field"><label for="staleHistory">Stale history (0&ndash;10): <span id="staleHistoryOut">4</span></label><input id="staleHistory" type="range" min="0" max="10" value="4"><small>Old / unrelated chat context still attached.</small></div>
+              <div class="calc-field"><label for="goalCount">Goals in one prompt: <span id="goalCountOut">2</span></label><input id="goalCount" type="range" min="1" max="8" value="2"><small>Multiple goals pull the answer in several directions.</small></div>
+              <div class="calc-field"><label for="unrelatedFiles">Unrelated files attached: <span id="unrelatedFilesOut">1</span></label><input id="unrelatedFiles" type="range" min="0" max="12" value="1"><small>Irrelevant files become false clues.</small></div>
+              <div class="calc-field check-line"><input id="hasConflicts" type="checkbox"><label for="hasConflicts">Conflicting instructions exist (e.g. &ldquo;be brief&rdquo; vs &ldquo;be exhaustive&rdquo;)</label></div>
+              <div class="calc-field check-line"><input id="hasCriteria" type="checkbox" checked><label for="hasCriteria">Success criteria stated (tests pass, output shape, acceptance)</label></div>
+            </div>
+
+            <div class="calc-panel score-result-panel" aria-live="polite">
+              <div class="calc-panel-head"><span class="section-kicker">Result</span><h3>Drift Score <span class="score-pill" id="driftValue">0</span></h3></div>
+              <div class="score-bandline"><span class="score-band" id="driftBand">On-track</span><span class="score-headline" id="driftText"></span></div>
+              <div class="legend">
+                <span><i class="sw sw-clarity"></i>Clarity gap</span>
+                <span><i class="sw sw-stale"></i>Stale history</span>
+                <span><i class="sw sw-goals"></i>Multi-goal</span>
+                <span><i class="sw sw-unrel"></i>Unrelated files</span>
+                <span><i class="sw sw-conflict"></i>Conflicts</span>
+                <span><i class="sw sw-criteria"></i>No criteria</span>
+              </div>
+              <div class="score-stack" id="driftStack" aria-hidden="true"></div>
+              <div class="score-breakdown" id="driftBreakdown"></div>
+              <h4 class="score-reco-title">What to fix first</h4>
+              <ul class="recommendations" id="driftRecommendations"></ul>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="calculator" class="section" aria-labelledby="calc-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Cost and pricing calculator</span>
+          <h2 id="calc-title">Price a turn. Compare every model.</h2>
+          <p>Pick a typical workload, choose the models you want to compare, and see input, cached, and output cost per turn and per session. Numbers are illustrative — verify against your organization's official pricing before quoting.</p>
+        </div>
+
+        <div class="calc-grid">
+          <div class="calc-panel">
+            <div class="calc-panel-head"><span class="section-kicker">Token mix</span><h3>Workload</h3></div>
+            <div class="preset-row" id="calcPresets" role="toolbar" aria-label="Token mix presets">
+              <button class="preset-btn" type="button" data-preset="qa">Quick Q&amp;A</button>
+              <button class="preset-btn" type="button" data-preset="refactor" aria-pressed="true">Daily refactor</button>
+              <button class="preset-btn" type="button" data-preset="agent">Agent task</button>
+              <button class="preset-btn" type="button" data-preset="long">Long session</button>
+            </div>
+
+            <div class="calc-field">
+              <label for="calcInput">Input tokens per turn</label>
+              <input id="calcInput" type="number" min="0" step="100" value="6000">
+              <small>Files, prompt, instructions, tool schemas, retrieved context.</small>
+            </div>
+            <div class="calc-field">
+              <label for="calcCached">Cached tokens per turn</label>
+              <input id="calcCached" type="number" min="0" step="100" value="20000">
+              <small>Stable byte-identical prefix billed at the cached rate.</small>
+            </div>
+            <div class="calc-field">
+              <label for="calcOutput">Output tokens per turn</label>
+              <input id="calcOutput" type="number" min="0" step="100" value="1200">
+              <small>Visible reply plus reasoning trace.</small>
+            </div>
+            <div class="calc-field">
+              <label for="calcReasoning">Reasoning effort</label>
+              <select id="calcReasoning">
+                <option value="0.7">Low (faster, cheaper)</option>
+                <option value="1" selected>Medium (default)</option>
+                <option value="1.6">High (slower, deeper)</option>
+              </select>
+              <small>Acts as a multiplier on output tokens — higher reasoning means more invisible work.</small>
+            </div>
+            <div class="calc-field">
+              <label for="calcTurns">Session turns</label>
+              <input id="calcTurns" type="number" min="1" max="200" step="1" value="6">
+            </div>
+            <div class="calc-field">
+              <label class="check-line"><input id="calcAuto" type="checkbox" checked> Auto Mode (~10% token-multiplier discount)</label>
+            </div>
+          </div>
+
+          <div class="calc-panel">
+            <div class="calc-panel-head"><span class="section-kicker">Models to compare</span><h3>Pick up to 6</h3></div>
+            <div class="model-tier" id="modelList"></div>
+          </div>
+        </div>
+
+        <div class="calc-results">
+          <div class="calc-panel">
+            <div class="calc-panel-head"><span class="section-kicker" id="calcSessionLabel">Session cost — 6 turn(s)</span><h3>Headline comparison</h3></div>
+            <div class="cost-cards" id="costCards"></div>
+          </div>
+          <div class="calc-panel">
+            <div class="calc-panel-head"><span class="section-kicker">Cost breakdown</span><h3>Where the money goes</h3></div>
+            <div class="legend"><span><i class="sw sw-input"></i> Input</span><span><i class="sw sw-cached"></i> Cached</span><span><i class="sw sw-output"></i> Output</span></div>
+            <div class="cost-table" id="costTable"></div>
+          </div>
+        </div>
+
+        <div class="calc-panel calc-reco">
+          <div class="calc-panel-head"><span class="section-kicker">Recommendation</span><h3 id="recoTitle">For this token mix</h3></div>
+          <ul class="recommendations" id="calcRecommendations"></ul>
+          <p class="fine-print">Illustrative rates synthesized from public token-optimizer reference material. Cached tokens are estimated at ~10% of the input rate. Reasoning effort is modeled as a multiplier on output tokens. Always verify against your organization's live pricing.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="levers" class="section" aria-labelledby="levers-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Eleven levers</span>
+          <h2 id="levers-title">Spend less per useful token</h2>
+          <p>The source playbook groups optimization into practical levers. Here they are rewritten for first-time users.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card"><span class="tag">01</span><h3>Prompt compression</h3><p>Remove words that do not change the meaning. Keep exact technical names.</p><p><strong>Action:</strong> write task, scope, constraints, output.</p></article>
+          <article class="card"><span class="tag">02</span><h3>Choose the right language</h3><p>English is often token-efficient for technical prompts, though teams should use the language that works for them.</p><p><strong>Action:</strong> use English for technical detail when practical.</p></article>
+          <article class="card"><span class="tag">03</span><h3>Manage context</h3><p>Separate always-on rules, file-specific rules, and on-demand playbooks.</p><p><strong>Action:</strong> do not load every rule on every request.</p></article>
+          <article class="card"><span class="tag">04</span><h3>Control output</h3><p>A short formatting rule can prevent long answers forever.</p><p><strong>Action:</strong> ask for the smallest answer that solves the task.</p></article>
+          <article class="card"><span class="tag">05</span><h3>Choose the right mode</h3><p>Ask is light, Plan is for design, Agent is for multi-step execution.</p><p><strong>Action:</strong> do not start Agent mode with a vague prompt.</p></article>
+          <article class="card"><span class="tag">06</span><h3>Work in phases</h3><p>Research, plan, and implement can use different context windows.</p><p><strong>Action:</strong> summarize between phases instead of dragging all history forward.</p></article>
+          <article class="card"><span class="tag">07</span><h3>Choose the right model</h3><p>Big models are valuable for hard judgment, but not every edit needs one.</p><p><strong>Action:</strong> use Auto Mode or mix models by task difficulty.</p></article>
+          <article class="card"><span class="tag">08</span><h3>Manage AGENTS files</h3><p>Agent rules should warn about project landmines, not repeat the whole codebase.</p><p><strong>Action:</strong> delete generic or obvious rules.</p></article>
+          <article class="card"><span class="tag">09</span><h3>Clean up tools</h3><p>Every enabled tool can add schema weight to agent steps.</p><p><strong>Action:</strong> audit tools and disable unused ones.</p></article>
+          <article class="card"><span class="tag">10</span><h3>Set usage limits</h3><p>Budgets and caps keep spend predictable before it surprises the team.</p><p><strong>Action:</strong> review allowance, overage, and alert settings.</p></article>
+          <article class="card"><span class="tag">11</span><h3>Power-user guidance</h3><p>Advanced patterns help after the basics are already working.</p><p><strong>Action:</strong> master scope, output, model choice, and measurement first.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" aria-labelledby="prompt-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Prompt framing</span>
+          <h2 id="prompt-title">Same task, cleaner framing</h2>
+          <p>The right prompt does not need to be long. It needs the right scope and outcome.</p>
+        </div>
+        <div class="compare">
+          <article class="prompt-box bad">
+            <span class="prompt-label bad">Bloated</span>
+            <pre>Hi, I am not sure what happened but something seems broken in checkout. Can you please look through the whole repo and figure out what is wrong? It might be related to tests, pricing, discounts, or maybe something else.</pre>
+          </article>
+          <article class="prompt-box good">
+            <span class="prompt-label good">Focused</span>
+            <pre>Task: Fix the failing checkout discount test.
+Scope: #file:cart.test.ts and #file:discounts.ts
+Expected: test passes without changing public API.
+Output: patch plus 3-line explanation.</pre>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="takeaways" class="section dark" aria-labelledby="takeaways-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Beginner habits</span>
+          <h2 id="takeaways-title">Four habits to start with</h2>
+          <p>Do not try to memorize every rule. Start with these habits and measure your own results.</p>
+        </div>
+        <div class="takeaway-row">
+          <article class="takeaway"><div class="takeaway-num">01</div><h3>Use Auto Mode</h3><p>Let the assistant route ordinary work to a suitable model unless the task needs a specific model.</p></article>
+          <article class="takeaway"><div class="takeaway-num">02</div><h3>Send the smallest slice</h3><p>Prefer exact files, selections, and errors over broad workspace requests.</p></article>
+          <article class="takeaway"><div class="takeaway-num">03</div><h3>Keep instructions stable</h3><p>Short reusable instructions are easier to cache and easier for teams to maintain.</p></article>
+          <article class="takeaway"><div class="takeaway-num">04</div><h3>Reset on task switch</h3><p>Start fresh or compact when moving from one problem to another.</p></article>
+        </div>
+      </div>
+    </section>
+  
+    </section>
+    <section class="view" id="view-bloat" role="tabpanel" aria-label="Bloat Score guide">
+
+    <section class="hero" aria-labelledby="bloat-hero-title">
+      <div class="wrap">
+        <span class="eyebrow">Bloat Score &middot; Under the hood</span>
+        <h1 id="bloat-hero-title">An in-depth guide to how the Bloat Score works.</h1>
+        <p>The Bloat Score is a 0&ndash;100 educational signal that estimates how much unnecessary context is riding along with your prompt. This page explains every component, how the points add up, what the bands mean, and walks through real examples so you can predict and lower your score before you click send.</p>
+        <div class="hero-actions">
+          <a class="btn secondary" href="#bloat-score" data-view="overview">Try the calculator</a>
+          <a class="btn ghost" href="#bloat-examples">Jump to examples</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bloat-what" aria-labelledby="bloat-what-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Definition</span>
+          <h2 id="bloat-what-title">What is the Bloat Score?</h2>
+          <p>Bloat is the input tokens you did not need. Every turn, an AI assistant sees your typed message <em>plus</em> attached files, repeated chat history, enabled tool schemas, always-on instructions, and how broadly you scoped the request. When any of those grows beyond what the task actually requires, the prompt becomes bloated &mdash; it costs more, runs slower, and tempts the model to follow side clues.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card teal">
+            <h3>It is a signal, not a bill</h3>
+            <p class="lead">The Bloat Score is an educational estimate. It is not a direct measure of token spend or vendor pricing. It tells you whether you are likely overspending tokens.</p>
+          </div>
+          <div class="card blue">
+            <h3>It is a 0&ndash;100 number</h3>
+            <p class="lead">Six components each contribute weighted points. The sum is clamped to 100. Bands map the score to a plain-English risk level: Low, Medium, High, Critical.</p>
+          </div>
+          <div class="card violet">
+            <h3>It changes per turn</h3>
+            <p class="lead">Bloat is dynamic. Removing a file, ending a chat, disabling a tool, or narrowing scope can drop the score noticeably between requests.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="bloat-formula" aria-labelledby="bloat-formula-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">The formula</span>
+          <h2 id="bloat-formula-title">Six components, each weighted by impact</h2>
+          <p>The score adds points across six categories. Heavier weights belong to inputs that grow the fastest in real workflows &mdash; files and chat history &mdash; while tool schemas have a smaller per-unit weight because each tool is small but they multiply.</p>
+        </div>
+
+        <table class="formula-table" aria-label="Bloat Score component weights">
+          <thead>
+            <tr><th>Component</th><th>Why it bloats</th><th>Per-unit weight</th><th>Max contribution</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Files &amp; references</td>
+              <td>Each attached file is re-sent on every turn until removed.</td>
+              <td class="weight">files &times; 1.6</td>
+              <td>32 (at 20 files)</td>
+            </tr>
+            <tr>
+              <td>Chat history</td>
+              <td>Older turns get replayed verbatim until you reset or compact.</td>
+              <td class="weight">turns &times; 1.15</td>
+              <td>46 (at 40 turns)</td>
+            </tr>
+            <tr>
+              <td>Enabled tools</td>
+              <td>Every enabled tool ships its JSON schema in the prompt.</td>
+              <td class="weight">tools &times; 0.42</td>
+              <td>33.6 (at 80 tools)</td>
+            </tr>
+            <tr>
+              <td>Always-on instructions</td>
+              <td>Project + user + org rules ride every turn.</td>
+              <td class="weight">0 / 8 / 18 / 28 (size band)</td>
+              <td>28 (Huge size)</td>
+            </tr>
+            <tr>
+              <td>Scope precision</td>
+              <td>Broader scope drags in more bytes than the task needs.</td>
+              <td class="weight">0 / 8 / 18 / 28 (precision band)</td>
+              <td>28 (Whole codebase)</td>
+            </tr>
+            <tr>
+              <td>Filler text</td>
+              <td>Long intros, apologies, repeated background.</td>
+              <td class="weight">+8 if present</td>
+              <td>8</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top: 0.9rem; color: var(--muted); font-size: 0.9rem;">
+          Total points are summed and then clamped to the range <code style="background: var(--soft); padding: 0.05rem 0.4rem; border-radius: 4px;">[0, 100]</code>. The clamp means a single component cannot push the score past 100, but two or three together easily can.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="bloat-bands" aria-labelledby="bloat-bands-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Score bands</span>
+          <h2 id="bloat-bands-title">What the number actually means</h2>
+          <p>The same score moves between four bands. Each band is a different conversation: how to act, how urgent the fix is, and what the likely failure mode looks like.</p>
+        </div>
+        <div class="bands">
+          <div class="band-card band-low">
+            <div class="range">0&ndash;29</div>
+            <div class="name">Low</div>
+            <p class="desc">Lean prompt. Keep scope tight, keep reusable instructions short, and you are getting good value per token.</p>
+          </div>
+          <div class="band-card band-medium">
+            <div class="range">30&ndash;59</div>
+            <div class="name">Medium</div>
+            <p class="desc">Some extra context riding along. Trim before it becomes habitual or expensive across many turns.</p>
+          </div>
+          <div class="band-card band-high">
+            <div class="range">60&ndash;79</div>
+            <div class="name">High</div>
+            <p class="desc">The model is reading more than it needs. Drift risk goes up, costs grow per turn, and the answer may follow side clues.</p>
+          </div>
+          <div class="band-card band-critical">
+            <div class="range">80&ndash;100</div>
+            <div class="name">Critical</div>
+            <p class="desc">Heavily bloated. Reset the session, attach exact files, disable unused tools, and shorten always-on instructions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="bloat-examples" aria-labelledby="bloat-examples-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Worked examples</span>
+          <h2 id="bloat-examples-title">Three prompts, three scores</h2>
+          <p>The same task &mdash; <em>&ldquo;rename a function and update the call sites&rdquo;</em> &mdash; can score very differently depending on how the request is framed. Each example shows the math, the contribution bar, and the practical takeaway.</p>
+        </div>
+
+        <div class="legend" aria-hidden="true">
+          <span><i class="sw-files"></i>Files</span>
+          <span><i class="sw-history"></i>History</span>
+          <span><i class="sw-tools"></i>Tools</span>
+          <span><i class="sw-instr"></i>Instructions</span>
+          <span><i class="sw-scope"></i>Scope</span>
+          <span><i class="sw-filler"></i>Filler</span>
+        </div>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 1 &middot; Lean prompt</h3>
+            <span class="ex-pill ex-low">Bloat Score 13 &middot; Low</span>
+          </div>
+          <p class="ex-prompt">&ldquo;In <strong>auth/session.ts</strong>, rename <code>getSession()</code> to <code>loadSession()</code> and update the call sites in this file only.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-files"   style="width: 12.3%"></span>
+            <span class="sw-history" style="width: 17.7%"></span>
+            <span class="sw-tools"   style="width: 12.9%"></span>
+            <span class="sw-instr"   style="width: 0%"></span>
+            <span class="sw-scope"   style="width: 57.1%"></span>
+            <span class="sw-filler"  style="width: 0%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Files &amp; references</span><div class="ex-bar"><span class="sw-files" style="width: 8%"></span></div><span class="pts">+1.6 pts</span></div>
+            <div class="ex-row"><span class="name">Chat history</span><div class="ex-bar"><span class="sw-history" style="width: 11.5%"></span></div><span class="pts">+2.3 pts</span></div>
+            <div class="ex-row"><span class="name">Enabled tools</span><div class="ex-bar"><span class="sw-tools" style="width: 8.4%"></span></div><span class="pts">+1.7 pts</span></div>
+            <div class="ex-row"><span class="name">Always-on instructions (Tiny)</span><div class="ex-bar"><span class="sw-instr" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+            <div class="ex-row"><span class="name">Scope precision (Specific file)</span><div class="ex-bar"><span class="sw-scope" style="width: 40%"></span></div><span class="pts">+8 pts</span></div>
+            <div class="ex-row"><span class="name">Filler text</span><div class="ex-bar"><span class="sw-filler" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">1 file &middot; 2 turns &middot; 4 tools &middot; Tiny instructions &middot; Specific file scope &middot; no filler</span><span class="total">13</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> Pointing at a single file with a single clear verb keeps almost every component near zero. The only meaningful contribution is the file-scope baseline.</p>
+        </article>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 2 &middot; Daily refactor</h3>
+            <span class="ex-pill ex-medium">Bloat Score 38 &middot; Medium</span>
+          </div>
+          <p class="ex-prompt">&ldquo;Can you take a look at <em>(3 files attached)</em> and the rest of the auth folder, and rename <code>getSession()</code> across the project? I think we covered some of this earlier in this chat.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-files"   style="width: 12.6%"></span>
+            <span class="sw-history" style="width: 18.2%"></span>
+            <span class="sw-tools"   style="width: 8.8%"></span>
+            <span class="sw-instr"   style="width: 21.1%"></span>
+            <span class="sw-scope"   style="width: 47.4%"></span>
+            <span class="sw-filler"  style="width: 0%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Files &amp; references (3)</span><div class="ex-bar"><span class="sw-files" style="width: 24%"></span></div><span class="pts">+4.8 pts</span></div>
+            <div class="ex-row"><span class="name">Chat history (6 turns)</span><div class="ex-bar"><span class="sw-history" style="width: 34.5%"></span></div><span class="pts">+6.9 pts</span></div>
+            <div class="ex-row"><span class="name">Enabled tools (8)</span><div class="ex-bar"><span class="sw-tools" style="width: 16.8%"></span></div><span class="pts">+3.4 pts</span></div>
+            <div class="ex-row"><span class="name">Always-on instructions (Healthy)</span><div class="ex-bar"><span class="sw-instr" style="width: 40%"></span></div><span class="pts">+8 pts</span></div>
+            <div class="ex-row"><span class="name">Scope precision (Folder / feature)</span><div class="ex-bar"><span class="sw-scope" style="width: 90%"></span></div><span class="pts">+18 pts</span></div>
+            <div class="ex-row"><span class="name">Filler text</span><div class="ex-bar"><span class="sw-filler" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">3 files &middot; 6 turns &middot; 8 tools &middot; Healthy instructions &middot; Folder scope</span><span class="total">38</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> Folder-level scope alone contributes almost half the score. Narrowing to the exact files would drop the score from 38 to roughly 28 with no information loss.</p>
+        </article>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 3 &middot; Kitchen-sink agent</h3>
+            <span class="ex-pill ex-critical">Bloat Score 96 &middot; Critical</span>
+          </div>
+          <p class="ex-prompt">&ldquo;Hey, I&rsquo;ve been working on this app for a few weeks now and I really need your help <em>(15 files attached, 35 turns of history, 60 tools enabled, &ldquo;huge&rdquo; instructions, whole-codebase scope, two paragraphs of background)</em>&hellip; please rename <code>getSession()</code> wherever it makes sense.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-files"   style="width: 23%"></span>
+            <span class="sw-history" style="width: 38.6%"></span>
+            <span class="sw-tools"   style="width: 24.1%"></span>
+            <span class="sw-instr"   style="width: 26.8%"></span>
+            <span class="sw-scope"   style="width: 26.8%"></span>
+            <span class="sw-filler"  style="width: 7.7%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Files &amp; references (15)</span><div class="ex-bar"><span class="sw-files" style="width: 75%"></span></div><span class="pts">+24 pts</span></div>
+            <div class="ex-row"><span class="name">Chat history (35 turns)</span><div class="ex-bar"><span class="sw-history" style="width: 87.5%"></span></div><span class="pts">+40.25 pts</span></div>
+            <div class="ex-row"><span class="name">Enabled tools (60)</span><div class="ex-bar"><span class="sw-tools" style="width: 75%"></span></div><span class="pts">+25.2 pts</span></div>
+            <div class="ex-row"><span class="name">Always-on instructions (Huge)</span><div class="ex-bar"><span class="sw-instr" style="width: 100%"></span></div><span class="pts">+28 pts</span></div>
+            <div class="ex-row"><span class="name">Scope precision (Whole codebase)</span><div class="ex-bar"><span class="sw-scope" style="width: 100%"></span></div><span class="pts">+28 pts</span></div>
+            <div class="ex-row"><span class="name">Filler text</span><div class="ex-bar"><span class="sw-filler" style="width: 100%"></span></div><span class="pts">+8 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">Raw total 153.45 &rarr; clamped to 100</span><span class="total">100</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> When raw points exceed 100 the score caps. The composition still matters &mdash; here, history alone (40+ pts) and broad scope (28 pts) are the cheapest places to cut. Resetting the chat and pinning two files brings this score below 35.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="bloat-patterns" aria-labelledby="bloat-patterns-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Anti-patterns</span>
+          <h2 id="bloat-patterns-title">Six common bloat traps and how to fix them</h2>
+          <p>These are the patterns that quietly add 10&ndash;30 points without changing what the user actually wanted.</p>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>The chat that never ends</h4>
+            <p>A session has been running for hours. New questions inherit 30+ turns of history that are no longer relevant.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Reset or compact</h4>
+            <p>Start a fresh chat for the new task, or use session compaction to summarize the prior thread into a short brief.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>The whole-folder fishing trip</h4>
+            <p>&ldquo;Have a look around the auth folder and figure out what to rename.&rdquo; Folder scope sends every file in the folder.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Name the file or selection</h4>
+            <p>&ldquo;In <code>auth/session.ts</code>, rename <code>getSession</code> to <code>loadSession</code> and update call sites in this file.&rdquo;</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>Every tool turned on, just in case</h4>
+            <p>50+ MCP tools are enabled. Every tool ships its JSON schema with every turn.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Trim to what this project needs</h4>
+            <p>Disable tools you do not actually use. Most teams only need a small subset (terminal, file edit, search) per workflow.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>The ever-growing AGENTS.md</h4>
+            <p>500+ lines of always-on instructions covering edge cases that come up once a quarter.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Move occasional rules into skills</h4>
+            <p>Keep AGENTS.md to landmines and non-obvious rules. Put workflow-specific guidance in a skill loaded only when needed.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>Polite prologue</h4>
+            <p>&ldquo;Hi! I hope you&rsquo;re doing well. Sorry to bother you, but I was wondering if you could possibly help me with&hellip;&rdquo;</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Lead with the verb</h4>
+            <p>&ldquo;Rename <code>getSession</code> to <code>loadSession</code> in <code>auth/session.ts</code>.&rdquo; Politeness has zero effect on output quality.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Bloat trap</span>
+            <h4>Drag-and-drop the whole folder</h4>
+            <p>15 files attached, of which only 2 are relevant to the change. The rest are noise the model has to ignore.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Pin the exact files</h4>
+            <p>Attach only the files the change touches. If the model needs more, it can ask or use search.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="bloat-fix" aria-labelledby="bloat-fix-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">How to lower it</span>
+          <h2 id="bloat-fix-title">A short checklist before you click send</h2>
+          <p>Run through these in order. The earlier items typically remove the most points for the least effort.</p>
+        </div>
+        <ul class="checklist">
+          <li><strong>Scope down first.</strong> Folder &rarr; file &rarr; selection. Each step removes 10 points and usually improves the answer.</li>
+          <li><strong>Reset the chat when the task changes.</strong> If your last 6 turns were about a different feature, start fresh.</li>
+          <li><strong>Detach files you no longer need.</strong> Especially after the model has already read them and given you the change.</li>
+          <li><strong>Disable tools that do not apply to this project.</strong> Most workflows need fewer than 10 tools.</li>
+          <li><strong>Trim always-on instructions.</strong> Move occasional or domain-specific rules into skills or prompts.</li>
+          <li><strong>Drop the prologue.</strong> Open with the verb and the file. State the outcome plainly.</li>
+          <li><strong>State a success criterion.</strong> Tests pass, output shape, or a visible behavior. This also drops the Drift Score.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="bloat-vs-cost" aria-labelledby="bloat-vs-cost-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Bloat vs. cost</span>
+          <h2 id="bloat-vs-cost-title">Why a high score does not always mean a high bill</h2>
+          <p>Bloat and cost are correlated, not identical. The Bloat Score does not know your model&rsquo;s pricing or your cached-token discount &mdash; it measures how much extra context you are sending. Use the cost calculator alongside it to translate that volume into dollars.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card amber">
+            <h3>High bloat, modest cost</h3>
+            <p class="lead">A heavy stable instruction prefix can dominate the prompt yet still be inexpensive when it qualifies for the cached-input rate (typically about 10% of the input price).</p>
+            <p class="lead"><strong>Action:</strong> keep the prefix byte-identical so it stays cached, and trim the non-cached portions.</p>
+          </div>
+          <div class="card red">
+            <h3>Modest bloat, surprising cost</h3>
+            <p class="lead">A lean prompt sent to a powerful model with high reasoning effort and a long output can still cost more per turn than a bloated prompt to a lightweight model.</p>
+            <p class="lead"><strong>Action:</strong> route routine work to lightweight models and use high reasoning only for genuinely hard problems.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="bloat-faq" aria-labelledby="bloat-faq-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">FAQ</span>
+          <h2 id="bloat-faq-title">Frequently asked questions</h2>
+        </div>
+
+        <details>
+          <summary>Is the Bloat Score the same as token count?</summary>
+          <p>No. Token count is a measured number reported by the model. The Bloat Score is an educational estimate based on factors that drive token count up. Two prompts with the same token count can have very different Bloat Scores if one of them is mostly stable cached prefix.</p>
+        </details>
+
+        <details>
+          <summary>Why are weights different across components?</summary>
+          <p>The weights reflect typical real-world impact. A single attached file can be hundreds of lines (1.6 weight), a chat turn is usually a paragraph or two (1.15 weight), and a tool schema is short but they add up linearly (0.42 weight). Always-on instructions and scope are stepped because their impact comes in discrete jumps.</p>
+        </details>
+
+        <details>
+          <summary>Why does the score cap at 100?</summary>
+          <p>Clamping makes the score human-readable. Past a certain point, more bloat is more bloat &mdash; the practical advice (reset, narrow scope, trim) does not change whether the raw total is 110 or 200.</p>
+        </details>
+
+        <details>
+          <summary>Does removing files always lower the score?</summary>
+          <p>Yes &mdash; each file detached removes 1.6 points. If you can also narrow scope from folder to file at the same time, you remove a 10-point step on top of that.</p>
+        </details>
+
+        <details>
+          <summary>Should I aim for a Bloat Score of 0?</summary>
+          <p>No. Some context is necessary. Aim for the lowest score that still gives the model what it needs to do the job correctly &mdash; usually that is somewhere in the Low band (0&ndash;29).</p>
+        </details>
+
+        <details>
+          <summary>How is this different from the AI Drift Score?</summary>
+          <p>Bloat Score measures unnecessary <em>input</em>. Drift Score measures the chance the <em>output</em> wanders away from the real task. They are correlated &mdash; bloated context invites drift &mdash; but you can have one without the other.</p>
+        </details>
+      </div>
+    </section>
+  
+    </section>
+    <section class="view" id="view-drift" role="tabpanel" aria-label="AI Drift Score guide">
+
+    <section class="hero" aria-labelledby="drift-hero-title">
+      <div class="wrap">
+        <span class="eyebrow">AI Drift Score &middot; Under the hood</span>
+        <h1 id="drift-hero-title">An in-depth guide to how the AI Drift Score works.</h1>
+        <p>The AI Drift Score is a 0&ndash;100 educational signal that estimates how likely the assistant&rsquo;s answer is to wander away from the real task. This page explains every component, the math behind it, what the bands mean, and walks through real examples so you can predict and lower drift before you click send.</p>
+        <div class="hero-actions">
+          <a class="btn secondary" href="#drift-score" data-view="overview">Try the calculator</a>
+          <a class="btn ghost" href="#drift-examples">Jump to examples</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="drift-what" aria-labelledby="drift-what-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Definition</span>
+          <h2 id="drift-what-title">What is the AI Drift Score?</h2>
+          <p>Drift is the gap between what you wanted and what the model decided to optimize for. Even a capable model can produce a confident, well-written, completely off-target answer when the request is unclear, contradictory, or buried under stale or unrelated context. Drift is independent of model strength &mdash; it is a function of the prompt and the surrounding session.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card violet">
+            <h3>It measures intent risk, not output quality</h3>
+            <p class="lead">Drift Score does not score whether the answer is correct. It scores whether the conditions exist for the model to silently solve the wrong problem.</p>
+          </div>
+          <div class="card blue">
+            <h3>It is a 0&ndash;100 number</h3>
+            <p class="lead">Six components contribute weighted points based on how strongly each one pulls the answer off-target. The sum is clamped to 100 and mapped to four bands.</p>
+          </div>
+          <div class="card teal">
+            <h3>It is fixable in seconds</h3>
+            <p class="lead">Unlike model errors, drift signals are usually one rewrite away from a much lower score: clarify the outcome, add a success criterion, drop the conflicting rule.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="drift-formula" aria-labelledby="drift-formula-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">The formula</span>
+          <h2 id="drift-formula-title">Six components, each weighted by how strongly it pulls focus</h2>
+          <p>Heavier weights belong to inputs that most reliably cause off-target output: clarity gap (because every other lever depends on it) and explicit conflicts (because the model must pick a side, often the wrong one).</p>
+        </div>
+
+        <table class="formula-table" aria-label="Drift Score component weights">
+          <thead>
+            <tr><th>Component</th><th>Why it causes drift</th><th>Per-unit weight</th><th>Max contribution</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clarity gap</td>
+              <td>If the outcome is fuzzy, the model invents a plausible one.</td>
+              <td class="weight">(10 &minus; clarity) &times; 4.5</td>
+              <td>45 (clarity 0/10)</td>
+            </tr>
+            <tr>
+              <td>Stale history</td>
+              <td>Old turns suggest the model is still &ldquo;doing&rdquo; the previous task.</td>
+              <td class="weight">stale &times; 4</td>
+              <td>40 (stale 10/10)</td>
+            </tr>
+            <tr>
+              <td>Multi-goal prompt</td>
+              <td>Each extra goal splits attention across competing outcomes.</td>
+              <td class="weight">max(0, goals &minus; 1) &times; 4</td>
+              <td>28 (8 goals)</td>
+            </tr>
+            <tr>
+              <td>Unrelated files</td>
+              <td>Irrelevant attachments become tempting false clues.</td>
+              <td class="weight">files &times; 4.2</td>
+              <td>50.4 (12 files)</td>
+            </tr>
+            <tr>
+              <td>Conflicting rules</td>
+              <td>Contradictions force the model to pick a side, often the wrong one.</td>
+              <td class="weight">+18 if present</td>
+              <td>18</td>
+            </tr>
+            <tr>
+              <td>Missing success criteria</td>
+              <td>Without an acceptance signal, the model cannot self-check.</td>
+              <td class="weight">+14 if missing</td>
+              <td>14</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top: 0.9rem; color: var(--muted); font-size: 0.9rem;">
+          Total points are summed and clamped to <code style="background: var(--soft); padding: 0.05rem 0.4rem; border-radius: 4px;">[0, 100]</code>. Note that clarity is the only inverted input &mdash; higher clarity reduces points; every other lever adds points as the input grows.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="drift-bands" aria-labelledby="drift-bands-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Score bands</span>
+          <h2 id="drift-bands-title">What the number actually means</h2>
+          <p>Drift bands are about confidence in the outcome. The same model can land cleanly in one band and wander in another &mdash; the band is set by the prompt, not the model.</p>
+        </div>
+        <div class="bands">
+          <div class="band-card band-low">
+            <div class="range">0&ndash;29</div>
+            <div class="name">On-track</div>
+            <p class="desc">The task is clear enough for the assistant to stay focused. Validate the answer against your criteria and move on.</p>
+          </div>
+          <div class="band-card band-medium">
+            <div class="range">30&ndash;59</div>
+            <div class="name">Watch</div>
+            <p class="desc">The answer may follow a side goal or stale history. Skim the output before accepting and re-state the outcome if needed.</p>
+          </div>
+          <div class="band-card band-high">
+            <div class="range">60&ndash;79</div>
+            <div class="name">Drifting</div>
+            <p class="desc">Drift risk is high. Clarify the desired outcome and remove unrelated context before proceeding.</p>
+          </div>
+          <div class="band-card band-critical">
+            <div class="range">80&ndash;100</div>
+            <div class="name">High drift</div>
+            <p class="desc">The assistant is likely to wander. Split the work, reset the chat, and state success criteria explicitly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="drift-examples" aria-labelledby="drift-examples-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Worked examples</span>
+          <h2 id="drift-examples-title">Three prompts, three drift scores</h2>
+          <p>The same underlying intent &mdash; <em>&ldquo;fix the broken login flow&rdquo;</em> &mdash; can produce very different drift risk depending on how the request is framed. Each example shows the math, the contribution bar, and the practical takeaway.</p>
+        </div>
+
+        <div class="legend" aria-hidden="true">
+          <span><i class="sw-clarity"></i>Clarity gap</span>
+          <span><i class="sw-stale"></i>Stale history</span>
+          <span><i class="sw-goals"></i>Multi-goal</span>
+          <span><i class="sw-unrel"></i>Unrelated files</span>
+          <span><i class="sw-conflict"></i>Conflicts</span>
+          <span><i class="sw-criteria"></i>No criteria</span>
+        </div>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 1 &middot; Focused ask</h3>
+            <span class="ex-pill ex-low">Drift Score 8 &middot; On-track</span>
+          </div>
+          <p class="ex-prompt">&ldquo;In <strong>auth/login.ts</strong>, fix the bug where <code>signIn()</code> returns <code>undefined</code> when the password contains a colon. The test in <code>login.test.ts</code> should pass.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-clarity"  style="width: 56.3%"></span>
+            <span class="sw-stale"    style="width: 50%"></span>
+            <span class="sw-goals"    style="width: 0%"></span>
+            <span class="sw-unrel"    style="width: 0%"></span>
+            <span class="sw-conflict" style="width: 0%"></span>
+            <span class="sw-criteria" style="width: 0%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Clarity gap (clarity 9/10)</span><div class="ex-bar"><span class="sw-clarity" style="width: 10%"></span></div><span class="pts">+4.5 pts</span></div>
+            <div class="ex-row"><span class="name">Stale history (1/10)</span><div class="ex-bar"><span class="sw-stale" style="width: 10%"></span></div><span class="pts">+4 pts</span></div>
+            <div class="ex-row"><span class="name">Multi-goal prompt (1 goal)</span><div class="ex-bar"><span class="sw-goals" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+            <div class="ex-row"><span class="name">Unrelated files (0)</span><div class="ex-bar"><span class="sw-unrel" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+            <div class="ex-row"><span class="name">Conflicting rules</span><div class="ex-bar"><span class="sw-conflict" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+            <div class="ex-row"><span class="name">Success criteria included</span><div class="ex-bar"><span class="sw-criteria" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">Clarity 9 &middot; stale 1 &middot; 1 goal &middot; no unrelated files &middot; no conflicts &middot; criteria stated</span><span class="total">8</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> A specific file, a specific function, a reproducible failure, and an acceptance test &mdash; this is the lowest-drift shape a prompt can take.</p>
+        </article>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 2 &middot; Mixed session</h3>
+            <span class="ex-pill ex-medium">Drift Score 41 &middot; Watch</span>
+          </div>
+          <p class="ex-prompt">&ldquo;Login is broken on prod and we should also probably refactor the session helper while we&rsquo;re in there. Use the <em>(8 attached files, including a styling sheet and the README)</em> from earlier in this chat to figure it out.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-clarity"  style="width: 32.9%"></span>
+            <span class="sw-stale"    style="width: 39%"></span>
+            <span class="sw-goals"    style="width: 9.8%"></span>
+            <span class="sw-unrel"    style="width: 20.5%"></span>
+            <span class="sw-conflict" style="width: 0%"></span>
+            <span class="sw-criteria" style="width: 0%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Clarity gap (clarity 7/10)</span><div class="ex-bar"><span class="sw-clarity" style="width: 30%"></span></div><span class="pts">+13.5 pts</span></div>
+            <div class="ex-row"><span class="name">Stale history (4/10)</span><div class="ex-bar"><span class="sw-stale" style="width: 40%"></span></div><span class="pts">+16 pts</span></div>
+            <div class="ex-row"><span class="name">Multi-goal prompt (2 goals)</span><div class="ex-bar"><span class="sw-goals" style="width: 14.3%"></span></div><span class="pts">+4 pts</span></div>
+            <div class="ex-row"><span class="name">Unrelated files (2 of 8)</span><div class="ex-bar"><span class="sw-unrel" style="width: 16.7%"></span></div><span class="pts">+8.4 pts</span></div>
+            <div class="ex-row"><span class="name">Conflicting rules</span><div class="ex-bar"><span class="sw-conflict" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+            <div class="ex-row"><span class="name">Success criteria included</span><div class="ex-bar"><span class="sw-criteria" style="width: 0%"></span></div><span class="pts">+0 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">Clarity 7 &middot; stale 4 &middot; 2 goals &middot; 2 unrelated files &middot; criteria stated</span><span class="total">41</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> Two goals plus stale history is enough to push the score from On-track into Watch. Splitting this into two prompts and resetting the chat would drop it back to ~12.</p>
+        </article>
+
+        <article class="example">
+          <div class="example-head">
+            <h3>Example 3 &middot; Conflicting / risky</h3>
+            <span class="ex-pill ex-critical">Drift Score 100 &middot; High drift</span>
+          </div>
+          <p class="ex-prompt">&ldquo;Something is off with login. Could you take a look around <em>(12 files attached, only 2 actually relevant)</em> and clean things up &mdash; rule says &ldquo;be brief&rdquo;, but also include exhaustive comments and explanations. Not sure exactly what done looks like.&rdquo;</p>
+          <div class="ex-stack" aria-hidden="true">
+            <span class="sw-clarity"  style="width: 23%"></span>
+            <span class="sw-stale"    style="width: 22.4%"></span>
+            <span class="sw-goals"    style="width: 9.6%"></span>
+            <span class="sw-unrel"    style="width: 20.1%"></span>
+            <span class="sw-conflict" style="width: 14.4%"></span>
+            <span class="sw-criteria" style="width: 11.2%"></span>
+          </div>
+          <div class="ex-rows">
+            <div class="ex-row"><span class="name">Clarity gap (clarity 4/10)</span><div class="ex-bar"><span class="sw-clarity" style="width: 60%"></span></div><span class="pts">+27 pts</span></div>
+            <div class="ex-row"><span class="name">Stale history (7/10)</span><div class="ex-bar"><span class="sw-stale" style="width: 70%"></span></div><span class="pts">+28 pts</span></div>
+            <div class="ex-row"><span class="name">Multi-goal prompt (4 goals)</span><div class="ex-bar"><span class="sw-goals" style="width: 42.9%"></span></div><span class="pts">+12 pts</span></div>
+            <div class="ex-row"><span class="name">Unrelated files (5 of 12)</span><div class="ex-bar"><span class="sw-unrel" style="width: 41.7%"></span></div><span class="pts">+21 pts</span></div>
+            <div class="ex-row"><span class="name">Conflicting rules</span><div class="ex-bar"><span class="sw-conflict" style="width: 100%"></span></div><span class="pts">+18 pts</span></div>
+            <div class="ex-row"><span class="name">Missing success criteria</span><div class="ex-bar"><span class="sw-criteria" style="width: 100%"></span></div><span class="pts">+14 pts</span></div>
+          </div>
+          <div class="ex-total"><span class="label">Raw total 120 &rarr; clamped to 100</span><span class="total">100</span></div>
+          <p class="ex-takeaway"><strong>Takeaway:</strong> Even the conflicting rule alone (+18) can push a borderline-Watch prompt into Drifting. Combined with no acceptance signal and a vague outcome, the answer is essentially a coin flip.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="drift-patterns" aria-labelledby="drift-patterns-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Anti-patterns</span>
+          <h2 id="drift-patterns-title">Six common drift traps and how to fix them</h2>
+          <p>These are the prompt shapes that quietly raise the drift score without changing the user&rsquo;s actual intent.</p>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>The vague verb</h4>
+            <p>&ldquo;Clean things up&rdquo;, &ldquo;make it better&rdquo;, &ldquo;improve performance&rdquo; &mdash; the model has to invent what &ldquo;better&rdquo; means.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>State the observable change</h4>
+            <p>&ldquo;Reduce <code>signIn()</code> error rate to zero for passwords containing a colon. The test in <code>login.test.ts</code> should pass.&rdquo;</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>Two goals in one breath</h4>
+            <p>&ldquo;Fix the bug and refactor the helper while you&rsquo;re in there.&rdquo; The model can do either well, but rarely both.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Split the prompt</h4>
+            <p>Do the bug fix first, validate it, then ask for the refactor as a separate request with its own success criteria.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>Riding on yesterday&rsquo;s chat</h4>
+            <p>The previous 10 turns were about a different feature. The model still sees them and assumes they remain relevant.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Start a fresh chat or summarize</h4>
+            <p>Open a new conversation for the new task, or paste a one-paragraph summary of the relevant prior context.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>The contradictory rules</h4>
+            <p>One instruction says &ldquo;be concise&rdquo;, another says &ldquo;include exhaustive comments and explanations.&rdquo; The model picks one and disappoints on the other.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Reconcile before asking</h4>
+            <p>Pick the rule that applies to this task, restate it once, and remove the contradicting one for this turn.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>The stowaway file</h4>
+            <p>You attached 8 files, but only 2 are relevant. The other 6 contain code names and patterns that look authoritative.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>Pin only the files the change touches</h4>
+            <p>Trim the attachment list. If the model needs more, it can ask or use search &mdash; you do not have to pre-load everything.</p>
+          </div>
+        </div>
+
+        <div class="ap">
+          <div class="bad">
+            <span class="tag">Drift trap</span>
+            <h4>No definition of &ldquo;done&rdquo;</h4>
+            <p>&ldquo;Refactor this and tell me when it&rsquo;s good.&rdquo; The model has no acceptance signal, so it stops when it feels satisfied.</p>
+          </div>
+          <div class="good">
+            <span class="tag">Lean fix</span>
+            <h4>State the criterion</h4>
+            <p>&ldquo;Tests pass&rdquo;, &ldquo;function returns a string of shape X&rdquo;, or &ldquo;no eslint errors&rdquo; &mdash; any concrete signal lets the model self-check.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="drift-fix" aria-labelledby="drift-fix-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">How to lower it</span>
+          <h2 id="drift-fix-title">A short checklist before you click send</h2>
+          <p>Run through these in order. The earlier items typically remove the most drift points for the least effort.</p>
+        </div>
+        <ul class="checklist">
+          <li><strong>Write the outcome as one sentence.</strong> If you cannot, the prompt is not ready &mdash; refine it before sending. This alone can remove 20+ points.</li>
+          <li><strong>Add a success criterion.</strong> Tests pass, output shape, file changed, page renders &mdash; any concrete signal removes 14 points and lets the model self-check.</li>
+          <li><strong>Keep one goal per prompt.</strong> Each extra goal is +4 points and roughly halves the chance the answer addresses both.</li>
+          <li><strong>Reset the chat when the task changes.</strong> Stale history is a per-point linear hit and a confidence multiplier on the wrong context.</li>
+          <li><strong>Resolve any contradictions in your rules.</strong> A single conflict is +18 points and forces the model to silently pick a side.</li>
+          <li><strong>Detach files that are not part of the change.</strong> Each unrelated file is +4.2 points and a tempting false clue.</li>
+          <li><strong>Re-read your prompt from the model&rsquo;s perspective.</strong> If the words could mean two different things, edit until they cannot.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="drift-vs-bloat" aria-labelledby="drift-vs-bloat-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Drift vs. bloat</span>
+          <h2 id="drift-vs-bloat-title">Two different signals about the same prompt</h2>
+          <p>Bloat measures unnecessary <em>input</em>; Drift measures the chance the <em>output</em> wanders. They are correlated &mdash; bloated context invites drift &mdash; but you can have one without the other.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card amber">
+            <h3>Low bloat, high drift</h3>
+            <p class="lead">A short prompt with a vague verb and no success criterion. The token count is tiny, but the model has nothing to anchor on.</p>
+            <p class="lead"><strong>Action:</strong> rewrite the outcome and add a concrete acceptance signal.</p>
+          </div>
+          <div class="card violet">
+            <h3>High bloat, low drift</h3>
+            <p class="lead">A long, file-heavy prompt that names the exact change and includes a passing test as the criterion. Expensive, but unlikely to drift.</p>
+            <p class="lead"><strong>Action:</strong> trim files and history to bring bloat down without losing the clarity that keeps drift low.</p>
+          </div>
+        </div>
+        <p style="margin-top: 1rem; color: var(--muted); font-size: 0.9rem;">
+          <a href="#" data-view="bloat">Read the in-depth Bloat Score guide &rarr;</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="section alt" id="drift-faq" aria-labelledby="drift-faq-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">FAQ</span>
+          <h2 id="drift-faq-title">Frequently asked questions</h2>
+        </div>
+
+        <details>
+          <summary>Is the AI Drift Score the same as accuracy?</summary>
+          <p>No. Accuracy is a property of the answer; Drift is a property of the prompt. A high Drift Score predicts a higher chance of an inaccurate answer, but a low Drift Score does not guarantee correctness &mdash; the model can still make mistakes inside a clear prompt.</p>
+        </details>
+
+        <details>
+          <summary>Why is clarity weighted so heavily?</summary>
+          <p>Because every other lever depends on it. If the outcome is unclear, even a short, conflict-free, clean-history prompt can still drift. Clarity is the only inverted input &mdash; raising it from 5 to 9 removes 18 points instantly.</p>
+        </details>
+
+        <details>
+          <summary>Why does a single conflict cost 18 points?</summary>
+          <p>Conflicts force the model into a discrete choice that you did not make. Unlike stale history (which just adds noise), a conflict actively rewards one outcome and penalizes another &mdash; whichever side the model picks, it disappoints the rule on the other side.</p>
+        </details>
+
+        <details>
+          <summary>Does a high Drift Score always produce a wrong answer?</summary>
+          <p>No. A capable model can still land correctly on a high-drift prompt, particularly with luck or repeated retries. The score predicts the <em>probability</em> of drift over many requests &mdash; not the outcome of any single one.</p>
+        </details>
+
+        <details>
+          <summary>Should I aim for a Drift Score of 0?</summary>
+          <p>You usually cannot. Some clarity gap is unavoidable in real prompts, and even a perfectly worded request gets ~5 points from a healthy clarity rating. Aim for the On-track band (0&ndash;29).</p>
+        </details>
+
+        <details>
+          <summary>How is this different from the Bloat Score?</summary>
+          <p>Bloat is about how much extra <em>input</em> rides along; Drift is about how likely the <em>output</em> is to wander. A bloated prompt can still be perfectly on-target if the outcome and acceptance criteria are explicit, and a lean prompt can still drift badly if the verb is vague.</p>
+        </details>
+      </div>
+    </section>
+  
+    </section>
+  </main>
+
+  <script>
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const scoreColor = (score) => {
+      if (score < 30) return '#16553a';
+      if (score < 60) return '#8a5a00';
+      if (score < 80) return '#9c3e00';
+      return '#a8181c';
+    };
+
+    const setMeter = (meter, score) => {
+      meter.style.width = `${score}%`;
+      meter.style.background = scoreColor(score);
+    };
+
+    const setList = (element, items) => {
+      element.innerHTML = '';
+      items.slice(0, 4).forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        element.appendChild(li);
+      });
+    };
+
+    const bloatInputs = {
+      filesAttached: document.getElementById('filesAttached'),
+      chatTurns: document.getElementById('chatTurns'),
+      enabledTools: document.getElementById('enabledTools'),
+      instructionLength: document.getElementById('instructionLength'),
+      scopeType: document.getElementById('scopeType'),
+      hasFiller: document.getElementById('hasFiller')
+    };
+
+    const driftInputs = {
+      clarity: document.getElementById('clarity'),
+      staleHistory: document.getElementById('staleHistory'),
+      goalCount: document.getElementById('goalCount'),
+      unrelatedFiles: document.getElementById('unrelatedFiles'),
+      hasConflicts: document.getElementById('hasConflicts'),
+      hasCriteria: document.getElementById('hasCriteria')
+    };
+
+    function instructionLabel(v) { return v === 0 ? 'Tiny: 0 pts' : v === 8 ? 'Healthy: 8 pts' : v === 18 ? 'Large: 18 pts' : 'Huge: 28 pts'; }
+    function scopeLabel(v)       { return v === 0 ? 'Exact selection: 0 pts' : v === 8 ? 'Specific file: 8 pts' : v === 18 ? 'Folder / feature: 18 pts' : 'Whole codebase: 28 pts'; }
+
+    function renderScoreStack(id, parts) {
+      const el = document.getElementById(id);
+      el.innerHTML = '';
+      parts.forEach((p) => {
+        if (p.raw <= 0) return;
+        const s = document.createElement('span');
+        s.className = p.cls;
+        s.style.width = p.pct + '%';
+        s.title = p.name + ': +' + p.raw.toFixed(1) + ' pts';
+        el.appendChild(s);
+      });
+    }
+
+    function renderScoreBreakdown(id, parts) {
+      const el = document.getElementById(id);
+      el.innerHTML = '';
+      parts.forEach((p) => {
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        row.innerHTML =
+          '<div class="score-row-head"><span class="name">' + p.name + '</span><span class="pts">+' + p.raw.toFixed(1) + ' pts</span></div>' +
+          '<div class="score-bar"><span class="' + p.cls + '" style="width:' + p.pct + '%"></span></div>' +
+          '<div class="score-row-meta"><b>' + p.meta + '</b> &middot; ' + p.explain + '</div>';
+        el.appendChild(row);
+      });
+    }
+
+    function updateBloatScore() {
+      const files = Number(bloatInputs.filesAttached.value);
+      const turns = Number(bloatInputs.chatTurns.value);
+      const tools = Number(bloatInputs.enabledTools.value);
+      const instruction = Number(bloatInputs.instructionLength.value);
+      const scope = Number(bloatInputs.scopeType.value);
+      const filler = bloatInputs.hasFiller.checked;
+
+      document.getElementById('filesAttachedOut').textContent = files;
+      document.getElementById('chatTurnsOut').textContent = turns;
+      document.getElementById('enabledToolsOut').textContent = tools;
+
+      const parts = [
+        { cls: 'sw-files',   name: 'Files & references',     raw: files * 1.6,
+          meta: files + ' file(s) \u00b7 weight 1.6 each',
+          explain: 'Each attached file is re-sent on every turn until removed.' },
+        { cls: 'sw-history', name: 'Chat history',           raw: turns * 1.15,
+          meta: turns + ' turn(s) \u00b7 weight 1.15 each',
+          explain: 'Older turns get replayed verbatim until you reset or compact.' },
+        { cls: 'sw-tools',   name: 'Enabled tools',          raw: tools * 0.42,
+          meta: tools + ' tool(s) \u00b7 weight 0.42 each',
+          explain: 'Every enabled tool ships its JSON schema in the prompt.' },
+        { cls: 'sw-instr',   name: 'Always-on instructions', raw: instruction,
+          meta: instructionLabel(instruction),
+          explain: 'Project + user + org rules ride every turn.' },
+        { cls: 'sw-scope',   name: 'Scope precision',        raw: scope,
+          meta: scopeLabel(scope),
+          explain: 'Narrowing scope cuts the most tokens for the least effort.' },
+        { cls: 'sw-filler',  name: 'Filler text',            raw: filler ? 8 : 0,
+          meta: filler ? 'On \u2014 adds 8 pts' : 'Off \u2014 0 pts',
+          explain: 'Apologies, repeated background, off-topic story.' }
+      ];
+
+      const rawTotal = parts.reduce((s, p) => s + p.raw, 0);
+      const score = Math.round(clamp(rawTotal, 0, 100));
+      const cap = Math.max(rawTotal, 100);
+      parts.forEach((p) => { p.pct = cap > 0 ? (p.raw / cap) * 100 : 0; });
+
+      const band = score < 30 ? 'Low' : score < 60 ? 'Medium' : score < 80 ? 'High' : 'Critical';
+      const text = score < 30
+        ? 'This prompt looks lean. Keep scope tight and instructions reusable.'
+        : score < 60
+          ? 'Some extra context is riding along. Trim scope before it gets expensive.'
+          : score < 80
+            ? 'The model is reading more than it needs. Trim files, tools, history, or scope.'
+            : 'Heavily bloated. Reset the session, attach exact files, disable unused tools.';
+
+      const recos = [];
+      if (files > 5 || scope >= 18) recos.push('Attach the exact file, function, or selection instead of folder or whole-codebase scope.');
+      if (turns > 12) recos.push('Start a fresh chat or compact the session before continuing.');
+      if (tools > 15) recos.push('Disable tools that are not needed for this project or task.');
+      if (instruction >= 18) recos.push('Move occasional rules into prompts or skills and keep always-on instructions short.');
+      if (filler) recos.push('Remove filler and keep task, scope, constraints, and output format.');
+      if (recos.length === 0) recos.push('This looks lean. Keep measuring real usage and avoid expanding scope by habit.');
+
+      document.getElementById('bloatValue').textContent = score;
+      const bandEl = document.getElementById('bloatBand');
+      bandEl.textContent = band;
+      bandEl.style.background = scoreColor(score);
+      document.getElementById('bloatText').textContent = text;
+      renderScoreStack('bloatStack', parts);
+      renderScoreBreakdown('bloatBreakdown', parts);
+      setList(document.getElementById('bloatRecommendations'), recos);
+    }
+
+    function updateDriftScore() {
+      const clarity = Number(driftInputs.clarity.value);
+      const stale = Number(driftInputs.staleHistory.value);
+      const goals = Number(driftInputs.goalCount.value);
+      const unrel = Number(driftInputs.unrelatedFiles.value);
+      const conflicts = driftInputs.hasConflicts.checked;
+      const noCriteria = !driftInputs.hasCriteria.checked;
+
+      document.getElementById('clarityOut').textContent = clarity;
+      document.getElementById('staleHistoryOut').textContent = stale;
+      document.getElementById('goalCountOut').textContent = goals;
+      document.getElementById('unrelatedFilesOut').textContent = unrel;
+
+      const parts = [
+        { cls: 'sw-clarity',  name: 'Clarity gap',              raw: (10 - clarity) * 4.5,
+          meta: 'Clarity ' + clarity + '/10 \u00b7 (10 \u2212 c) \u00d7 4.5',
+          explain: 'If the outcome is unclear, the model invents one.' },
+        { cls: 'sw-stale',    name: 'Stale history',            raw: stale * 4,
+          meta: stale + '/10 \u00b7 weight \u00d7 4',
+          explain: 'Old turns suggest the model is still "doing" the previous task.' },
+        { cls: 'sw-goals',    name: 'Multi-goal prompt',        raw: Math.max(0, goals - 1) * 4,
+          meta: goals + ' goal(s) \u00b7 (goals \u2212 1) \u00d7 4',
+          explain: 'Each extra goal splits attention between outcomes.' },
+        { cls: 'sw-unrel',    name: 'Unrelated files',          raw: unrel * 4.2,
+          meta: unrel + ' file(s) \u00b7 weight \u00d7 4.2',
+          explain: 'Irrelevant files become tempting false clues.' },
+        { cls: 'sw-conflict', name: 'Conflicting rules',        raw: conflicts ? 18 : 0,
+          meta: conflicts ? 'On \u2014 adds 18 pts' : 'Off \u2014 0 pts',
+          explain: 'Contradictions force the model to pick a side, often the wrong one.' },
+        { cls: 'sw-criteria', name: 'Missing success criteria', raw: noCriteria ? 14 : 0,
+          meta: noCriteria ? 'No criteria \u2014 adds 14 pts' : 'Criteria included \u2014 0 pts',
+          explain: 'Without an acceptance signal, the model cannot self-check.' }
+      ];
+
+      const rawTotal = parts.reduce((s, p) => s + p.raw, 0);
+      const score = Math.round(clamp(rawTotal, 0, 100));
+      const cap = Math.max(rawTotal, 100);
+      parts.forEach((p) => { p.pct = cap > 0 ? (p.raw / cap) * 100 : 0; });
+
+      const band = score < 30 ? 'On-track' : score < 60 ? 'Watch' : score < 80 ? 'Drifting' : 'High drift';
+      const text = score < 30
+        ? 'The task is likely clear enough for the assistant to stay focused.'
+        : score < 60
+          ? 'The answer may drift if the assistant follows stale history or a side goal.'
+          : score < 80
+            ? 'Drift risk is high. Clarify the desired outcome and remove unrelated context.'
+            : 'The assistant is likely to wander. Split the work, reset context, state success criteria.';
+
+      const recos = [];
+      if (clarity < 6) recos.push('Rewrite the request as one clear sentence describing the final outcome.');
+      if (stale > 5) recos.push('Start a new chat or summarize only the relevant history.');
+      if (goals > 2) recos.push('Split the prompt into separate tasks instead of asking for everything at once.');
+      if (unrel > 2) recos.push('Remove unrelated files so the model does not chase false clues.');
+      if (conflicts) recos.push('Resolve conflicting instructions before asking the model to act.');
+      if (noCriteria) recos.push('Add success criteria such as tests pass, page renders, or output shape.');
+      if (recos.length === 0) recos.push('This looks focused. Keep the task scoped and validate the answer against your criteria.');
+
+      document.getElementById('driftValue').textContent = score;
+      const bandEl = document.getElementById('driftBand');
+      bandEl.textContent = band;
+      bandEl.style.background = scoreColor(score);
+      document.getElementById('driftText').textContent = text;
+      renderScoreStack('driftStack', parts);
+      renderScoreBreakdown('driftBreakdown', parts);
+      setList(document.getElementById('driftRecommendations'), recos);
+    }
+
+    const BLOAT_PRESETS = {
+      lean:    { filesAttached: 1,  chatTurns: 2,  enabledTools: 4,  instructionLength: 0,  scopeType: 0,  hasFiller: false },
+      daily:   { filesAttached: 3,  chatTurns: 6,  enabledTools: 8,  instructionLength: 8,  scopeType: 8,  hasFiller: false },
+      agent:   { filesAttached: 8,  chatTurns: 20, enabledTools: 30, instructionLength: 18, scopeType: 18, hasFiller: false },
+      kitchen: { filesAttached: 16, chatTurns: 35, enabledTools: 60, instructionLength: 28, scopeType: 28, hasFiller: true  }
+    };
+    const DRIFT_PRESETS = {
+      focused: { clarity: 9, staleHistory: 1, goalCount: 1, unrelatedFiles: 0, hasConflicts: false, hasCriteria: true  },
+      mixed:   { clarity: 7, staleHistory: 4, goalCount: 2, unrelatedFiles: 1, hasConflicts: false, hasCriteria: true  },
+      vague:   { clarity: 3, staleHistory: 6, goalCount: 3, unrelatedFiles: 4, hasConflicts: false, hasCriteria: false },
+      risky:   { clarity: 4, staleHistory: 7, goalCount: 4, unrelatedFiles: 5, hasConflicts: true,  hasCriteria: false }
+    };
+
+    function applyScorePreset(presetMap, inputs, key, btnGroupId, dataAttr, updateFn) {
+      const p = presetMap[key];
+      if (!p) return;
+      Object.keys(p).forEach((k) => {
+        const el = inputs[k];
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = p[k];
+        else el.value = p[k];
+      });
+      document.querySelectorAll('#' + btnGroupId + ' .preset-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[dataAttr] === key)));
+      updateFn();
+    }
+
+    document.querySelectorAll('#bloatPresets .preset-btn').forEach((b) => b.addEventListener('click', () => applyScorePreset(BLOAT_PRESETS, bloatInputs, b.dataset.bp, 'bloatPresets', 'bp', updateBloatScore)));
+    document.querySelectorAll('#driftPresets .preset-btn').forEach((b) => b.addEventListener('click', () => applyScorePreset(DRIFT_PRESETS, driftInputs, b.dataset.dp, 'driftPresets', 'dp', updateDriftScore)));
+
+    Object.values(bloatInputs).forEach((input) => input.addEventListener('input', updateBloatScore));
+    Object.values(driftInputs).forEach((input) => input.addEventListener('input', updateDriftScore));
+
+    document.querySelectorAll('.filter-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        document.querySelectorAll('.filter-btn').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        document.querySelectorAll('.scenario-card').forEach((card) => {
+          const visible = filter === 'all' || card.dataset.category === filter;
+          card.dataset.hidden = String(!visible);
+        });
+      });
+    });
+
+    updateBloatScore();
+    updateDriftScore();
+
+    /* ---------- Calculator ---------- */
+    const MODELS = [
+      { id: 'gpt5mini',  tier: 'Lightweight', name: 'GPT-5 mini',       vendor: 'OpenAI',    inRate: 0.25, outRate: 2,    selected: true  },
+      { id: 'gpt54nano', tier: 'Lightweight', name: 'GPT-5.4 nano',     vendor: 'OpenAI',    inRate: 0.15, outRate: 1.25, selected: false },
+      { id: 'gpt54mini', tier: 'Lightweight', name: 'GPT-5.4 mini',     vendor: 'OpenAI',    inRate: 0.55, outRate: 4.5,  selected: false },
+      { id: 'grok',      tier: 'Lightweight', name: 'Grok Code Fast 1', vendor: 'xAI',       inRate: 0.20, outRate: 1.5,  selected: false },
+      { id: 'gem3flash', tier: 'Lightweight', name: 'Gemini 3 Flash',   vendor: 'Google',    inRate: 0.30, outRate: 3,    selected: false },
+      { id: 'gpt41',     tier: 'Versatile',   name: 'GPT-4.1',          vendor: 'OpenAI',    inRate: 2,    outRate: 8,    selected: false },
+      { id: 'haiku',     tier: 'Versatile',   name: 'Claude Haiku 4.5', vendor: 'Anthropic', inRate: 1,    outRate: 5,    selected: false },
+      { id: 'gpt54',     tier: 'Versatile',   name: 'GPT-5.4',          vendor: 'OpenAI',    inRate: 2.5,  outRate: 15,   selected: false },
+      { id: 'sonnet',    tier: 'Versatile',   name: 'Claude Sonnet 4.6',vendor: 'Anthropic', inRate: 3,    outRate: 15,   selected: true  },
+      { id: 'gem25pro',  tier: 'Powerful',    name: 'Gemini 2.5 Pro',   vendor: 'Google',    inRate: 2.5,  outRate: 10,   selected: false },
+      { id: 'gem31pro',  tier: 'Powerful',    name: 'Gemini 3.1 Pro',   vendor: 'Google',    inRate: 3,    outRate: 12,   selected: false },
+      { id: 'codex',     tier: 'Powerful',    name: 'GPT-5.2-Codex',    vendor: 'OpenAI',    inRate: 3.5,  outRate: 14,   selected: false },
+      { id: 'opus',      tier: 'Powerful',    name: 'Claude Opus 4.7',  vendor: 'Anthropic', inRate: 15,   outRate: 75,   selected: true  }
+    ];
+
+    const PRESETS = {
+      qa:       { input: 1500,  cached: 4000,  output: 400,  turns: 2,  label: 'Quick Q&A' },
+      refactor: { input: 6000,  cached: 20000, output: 1200, turns: 6,  label: 'Daily refactor' },
+      agent:    { input: 18000, cached: 40000, output: 4000, turns: 15, label: 'Agent task' },
+      long:     { input: 12000, cached: 80000, output: 2500, turns: 30, label: 'Long session' }
+    };
+
+    const fmt = (n) => '$' + (n >= 1 ? n.toFixed(2) : n.toFixed(4));
+
+    function renderModelList() {
+      const root = document.getElementById('modelList');
+      const tiers = ['Lightweight', 'Versatile', 'Powerful'];
+      const tierDesc = {
+        Lightweight: 'Boilerplate, formatting, simple Q&A, bulk edits',
+        Versatile:   'Daily-driver coding, refactors, iterative work',
+        Powerful:    'Architectural reasoning, hard debugging, plan steps'
+      };
+      root.innerHTML = '';
+      tiers.forEach((tier) => {
+        const block = document.createElement('div');
+        block.className = 'tier-block';
+        const h = document.createElement('h4');
+        h.textContent = tier + ' \u2014 ' + tierDesc[tier];
+        block.appendChild(h);
+        MODELS.filter((m) => m.tier === tier).forEach((m) => {
+          const row = document.createElement('label');
+          row.className = 'model-row';
+          row.innerHTML = '<input type="checkbox" data-model="' + m.id + '"' + (m.selected ? ' checked' : '') + '><span class="model-name">' + m.name + ' <span class="model-vendor">' + m.vendor + '</span></span><span class="model-rate">$' + m.inRate + ' in / $' + m.outRate + ' out / 1M</span>';
+          block.appendChild(row);
+        });
+        root.appendChild(block);
+      });
+      root.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('change', () => {
+          const model = MODELS.find((m) => m.id === cb.dataset.model);
+          if (model) model.selected = cb.checked;
+          renderCalcResults();
+        });
+      });
+    }
+
+    function computeCost(model, mix, reasoning, turns, autoDiscount) {
+      const effOutput = mix.output * reasoning;
+      const inputCost  = (mix.input  / 1e6) * model.inRate;
+      const cachedCost = (mix.cached / 1e6) * model.inRate * 0.1;
+      const outputCost = (effOutput / 1e6) * model.outRate;
+      let perTurn = inputCost + cachedCost + outputCost;
+      if (autoDiscount) perTurn *= 0.9;
+      const session = perTurn * turns;
+      return { inputCost, cachedCost, outputCost, perTurn, session };
+    }
+
+    function renderCalcResults() {
+      const mix = {
+        input:  Math.max(0, Number(document.getElementById('calcInput').value)  || 0),
+        cached: Math.max(0, Number(document.getElementById('calcCached').value) || 0),
+        output: Math.max(0, Number(document.getElementById('calcOutput').value) || 0)
+      };
+      const reasoning = Number(document.getElementById('calcReasoning').value) || 1;
+      const turns = Math.max(1, Math.floor(Number(document.getElementById('calcTurns').value) || 1));
+      const autoDiscount = document.getElementById('calcAuto').checked;
+      document.getElementById('calcSessionLabel').textContent = 'Session cost \u2014 ' + turns + ' turn(s)';
+
+      const selected = MODELS.filter((m) => m.selected);
+      const results = selected.map((model) => ({ model, cost: computeCost(model, mix, reasoning, turns, autoDiscount) }));
+      results.sort((a, b) => a.cost.session - b.cost.session);
+
+      const cards = document.getElementById('costCards');
+      cards.innerHTML = '';
+      if (results.length === 0) {
+        cards.innerHTML = '<div class="cost-card"><div class="cc-name">Select at least one model</div><div class="cc-price">&mdash;</div></div>';
+      } else {
+        results.forEach((r, idx) => {
+          const card = document.createElement('div');
+          card.className = 'cost-card' + (idx === 0 ? ' best' : '');
+          card.innerHTML = (idx === 0 ? '<span class="cc-tag">Best value</span>' : '') +
+            '<div><div class="cc-name">' + r.model.name + '</div><div class="cc-meta">' + r.model.vendor + ' \u00b7 ' + r.model.tier + '</div></div>' +
+            '<div class="cc-price">' + fmt(r.cost.session) + '</div>' +
+            '<div class="cc-meta">' + fmt(r.cost.perTurn) + ' / turn</div>';
+          cards.appendChild(card);
+        });
+      }
+
+      const table = document.getElementById('costTable');
+      table.innerHTML = '';
+      results.forEach((r) => {
+        const total = r.cost.inputCost + r.cost.cachedCost + r.cost.outputCost;
+        const pi = total > 0 ? (r.cost.inputCost / total) * 100 : 0;
+        const pc = total > 0 ? (r.cost.cachedCost / total) * 100 : 0;
+        const po = total > 0 ? (r.cost.outputCost / total) * 100 : 0;
+        const row = document.createElement('div');
+        row.className = 'cost-row';
+        row.innerHTML = '<div class="cost-row-head"><span class="name">' + r.model.name + '</span><span class="turn">' + fmt(r.cost.perTurn) + ' per turn</span></div>' +
+          '<div class="cost-bar"><span class="b-input" style="width:' + pi + '%"></span><span class="b-cached" style="width:' + pc + '%"></span><span class="b-output" style="width:' + po + '%"></span></div>' +
+          '<div class="cost-row-meta"><span><b>Input</b> ' + fmt(r.cost.inputCost) + '</span><span><b>Cached</b> ' + fmt(r.cost.cachedCost) + '</span><span><b>Output</b> ' + fmt(r.cost.outputCost) + '</span></div>';
+        table.appendChild(row);
+      });
+
+      const reco = document.getElementById('calcRecommendations');
+      reco.innerHTML = '';
+      if (results.length >= 2) {
+        const cheapest = results[0];
+        const dearest = results[results.length - 1];
+        const saving = dearest.cost.session - cheapest.cost.session;
+        const cachedShare = (mix.cached) / (mix.input + mix.cached || 1);
+        const items = [
+          'For this token mix, ' + cheapest.model.name + ' is the lowest-cost option at ' + fmt(cheapest.cost.session) + ' per session \u2014 ' + fmt(saving) + ' less than ' + dearest.model.name + '.'
+        ];
+        if (cachedShare > 0.5) items.push('Your cached share is healthy. A stable instruction prefix is doing real work \u2014 keep it byte-identical to hold the discount.');
+        else items.push('Cached share is low. Move stable rules into a reusable prefix so more tokens qualify for the cached rate.');
+        if (reasoning > 1.2) items.push('Reasoning effort is set high. Lower it to medium or low for routine work \u2014 output is usually the most expensive lane.');
+        if (!autoDiscount) items.push('Auto Mode is off. Enabling it applies a ~10% token-multiplier discount across supported models.');
+        items.forEach((text) => { const li = document.createElement('li'); li.textContent = text; reco.appendChild(li); });
+      } else if (results.length === 1) {
+        const li = document.createElement('li');
+        li.textContent = 'Add another model to compare costs side by side.';
+        reco.appendChild(li);
+      }
+    }
+
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('calcInput').value = p.input;
+      document.getElementById('calcCached').value = p.cached;
+      document.getElementById('calcOutput').value = p.output;
+      document.getElementById('calcTurns').value = p.turns;
+      document.querySelectorAll('#calcPresets .preset-btn').forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.preset === key)));
+      renderCalcResults();
+    }
+
+    document.querySelectorAll('#calcPresets .preset-btn').forEach((btn) => btn.addEventListener('click', () => applyPreset(btn.dataset.preset)));
+    ['calcInput','calcCached','calcOutput','calcReasoning','calcTurns','calcAuto'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', renderCalcResults);
+    });
+
+    renderModelList();
+    renderCalcResults();
+
+    /* ---------- Inline terminology tooltips ---------- */
+    const TERMS = {
+      'Token':              { meaning: 'A small chunk of text or code an AI model reads or writes.',                                    why: 'More tokens usually mean more cost and slower responses.',                                action: 'Send only what the task needs.' },
+      'Input token':        { meaning: 'Content sent to the model before it answers.',                                                 why: 'Files, history, and tools can be larger than your typed question.',                       action: 'Prefer file or selection scope over broad workspace scope.' },
+      'Input tokens':       { meaning: 'Content sent to the model before it answers.',                                                 why: 'Files, history, and tools can be larger than your typed question.',                       action: 'Prefer file or selection scope over broad workspace scope.' },
+      'Cached input':       { meaning: 'Repeated context billed at a lower rate when stable.',                                          why: 'Stable instructions become cheaper across repeated turns.',                                action: 'Keep reusable prefixes byte-identical.' },
+      'Cached tokens':      { meaning: 'The stable prefix portion of input that qualifies for the cached rate.',                       why: 'Cached rate is roughly 10% of normal input rate.',                                         action: 'Move stable rules into a reusable prefix.' },
+      'Output token':       { meaning: 'Text, code, and structured data the model generates.',                                          why: 'Output can cost several times more than input on some models.',                            action: 'Ask for concise output when you do not need a long explanation.' },
+      'Output tokens':      { meaning: 'Text, code, and structured data the model generates.',                                          why: 'Output can cost several times more than input on some models.',                            action: 'Ask for concise output when you do not need a long explanation.' },
+      'System instructions':{ meaning: 'Always-on rules that guide how the assistant behaves.',                                         why: 'They ride along on every request.',                                                        action: 'Keep them clear, short, and durable.' },
+      'Custom instructions':{ meaning: 'Project or file-specific guidance such as coding style and test rules.',                       why: 'Helpful rules reduce mistakes; bloated rules add cost.',                                   action: 'Store only rules the model cannot infer from code.' },
+      'Tool schema':        { meaning: 'A description of a tool the model can call (e.g. an MCP tool).',                               why: 'Enabled tool descriptions are sent repeatedly.',                                            action: 'Turn off tools not needed for the project.' },
+      'tool schemas':       { meaning: 'Descriptions of tools the model can call.',                                                    why: 'Every enabled tool ships its JSON schema in the prompt.',                                  action: 'Disable tools you do not actually use.' },
+      'MCP':                { meaning: 'Model Context Protocol — a way to connect AI assistants to tools and data.',                   why: 'Powerful, but many enabled tools can increase context size.',                              action: 'Enable the smallest toolset that supports the workflow.' },
+      'Chat history':       { meaning: 'Earlier messages that remain in the conversation.',                                            why: 'Old turns keep riding along and can confuse the model.',                                   action: 'Start a new chat when the task changes.' },
+      'Retrieved context':  { meaning: 'Files, snippets, or search results pulled in to answer the question.',                         why: 'Irrelevant retrieval creates noise and drift.',                                            action: 'Name the exact files or folders that matter.' },
+      'Prompt compression': { meaning: 'Removing filler words while keeping the instruction clear.',                                   why: 'Short prompts reduce cost and ambiguity.',                                                action: 'Replace polite setup with task, scope, and outcome.' },
+      'Context rot':        { meaning: 'When old, broad, or conflicting context makes the model less focused.',                        why: 'It raises cost and lowers answer quality.',                                                action: 'Reset, compact, or remove stale context.' },
+      'Context bloat':      { meaning: 'Sending more files, history, tools, or rules than the task requires.',                         why: 'The model reads extra material and may follow the wrong clue.',                            action: 'Scope down before asking the model to solve the problem.' },
+      'Model routing':      { meaning: 'Choosing a model that fits the task difficulty.',                                              why: 'A powerful model for simple edits can cost more than needed.',                             action: 'Use Auto Mode or choose lighter models for routine work.' },
+      'Reasoning effort':   { meaning: 'How much deep thinking the model is asked to spend.',                                          why: 'High reasoning is useful but expensive for easy tasks.',                                   action: 'Use low or medium for routine work; high for hard ambiguity.' },
+      'Auto Mode':          { meaning: 'A routing setting that lets Copilot pick an appropriate model.',                               why: 'Reduces manual model choice and can provide cost advantages.',                             action: 'Use as a default unless a task needs a specific model.' },
+      'Ask mode':           { meaning: 'A focused question-and-answer workflow.',                                                      why: 'Usually the lightest mode for quick lookups.',                                             action: 'Use Ask for explanations, searches, and small questions.' },
+      'Plan mode':          { meaning: 'A workflow for designing the solution before implementation.',                                 why: 'Helps reduce rework on medium or risky changes.',                                          action: 'Use Plan when you need agreement before code edits.' },
+      'Agent mode':         { meaning: 'A workflow where the assistant takes multiple steps and uses tools.',                          why: 'Can perform big tasks, but vague prompts multiply cost.',                                  action: 'Use Agent for clear-scope implementation tasks.' },
+      'Subagent':           { meaning: 'A helper agent that researches separately and returns a summary.',                             why: 'The main chat stays lean while the subagent reads more context.',                          action: 'Use subagents for broad exploration, then continue from the summary.' },
+      'Skill':              { meaning: 'Reusable domain instructions the assistant loads when relevant.',                              why: 'Keeps specialized knowledge out of every request.',                                        action: 'Put occasional playbooks in skills, not always-on instructions.' },
+      'Custom agent':       { meaning: 'A named assistant role with focused instructions and tools.',                                  why: 'Narrows behavior for repeated workflows.',                                                 action: 'Create one when a team repeats the same type of work often.' },
+      'AGENTS.md':          { meaning: 'A file that tells coding agents project-specific rules.',                                      why: 'A noisy file adds cost and can reduce correctness.',                                       action: 'Keep only landmines and non-obvious rules.' },
+      'Hook':               { meaning: 'An event-based automation that runs on save, commit, etc.',                                    why: 'Enforces rules without sending every rule to the model.',                                  action: 'Use hooks for deterministic checks that do not need AI reasoning.' },
+      'AI credits':         { meaning: 'Usage allowance or budget units consumed by AI activity.',                                     why: 'Teams need to know what consumes allowance and what causes overage.',                      action: 'Track consumption by workflow, model, and team.' },
+      'Usage-based billing':{ meaning: 'A pricing model where actual AI usage affects cost.',                                          why: 'Prompt size, model choice, tools, and output length become budget topics.',                action: 'Measure usage before and after optimization changes.' },
+      'Cache discount':     { meaning: 'A lower cost applied to repeated stable context on supported models.',                         why: 'Rewards teams that keep common instructions consistent.',                                  action: 'Keep reusable prefixes byte-stable where possible.' },
+      'Session compaction': { meaning: 'Summarizing a long conversation so less old history rides forward.',                          why: 'Preserves continuity while reducing token load and drift risk.',                           action: 'Compact before a long chat becomes noisy.' },
+      'Overage cap':        { meaning: 'A spending limit that prevents usage from running beyond budget.',                             why: 'Protects the organization from surprise cost.',                                            action: 'Set a cap and review it with usage reports.' },
+      'Language tax':       { meaning: 'Some languages tokenize less efficiently than English on some models.',                       why: 'The same meaning may cost more tokens in another language.',                               action: 'Use English for technical prompts when practical.' },
+      'Governance':         { meaning: 'Team-level rules for spend, defaults, measurement, and exceptions.',                           why: 'Individual habits help; governance keeps org-wide cost predictable.',                      action: 'Define defaults for model choice, tool access, and budget alerts.' },
+      'Bloat Score':        { meaning: 'An educational 0\u2013100 estimate of unnecessary context in a request.',                      why: 'High bloat increases cost and distracts the model.',                                       action: 'Reduce files, tools, stale turns, and broad scope.' },
+      'AI Drift Score':     { meaning: 'An educational 0\u2013100 estimate of how likely the answer is to wander from the real task.', why: 'Drift creates wrong work even when the model sounds confident.',                           action: 'State success criteria and remove unrelated or conflicting context.' },
+      'Drift':              { meaning: 'When the assistant follows stale history or a side goal instead of the real task.',           why: 'Produces confident but off-target answers.',                                               action: 'Reset context, clarify the outcome, state success criteria.' }
+    };
+
+    function buildTermRegex() {
+      const keys = Object.keys(TERMS).sort((a, b) => b.length - a.length);
+      const escaped = keys.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      return new RegExp('(?<![\\w-])(' + escaped.join('|') + ')(?![\\w-])', 'g');
+    }
+
+    const TERM_RE = buildTermRegex();
+    const SKIP_SELECTOR = 'script, style, a, button, label, input, select, textarea, option, code, pre, h1, h2, h3, h4, h5, h6, .term-pill, .t-term, .section-kicker, .brand, .eyebrow, .nav-links, .preset-btn, .filter-btn, .score-band, .score-pill, .cc-tag, .cc-price, .score-row-head, .model-row, .cost-row-head, .score-row-meta, .cost-row-meta, .lane-icon, .meter, .flow-chip, .pay-chip, .pay-stack, .legend';
+
+    function wrapTermsIn(root) {
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          if (node.parentElement && node.parentElement.closest(SKIP_SELECTOR)) return NodeFilter.FILTER_REJECT;
+          TERM_RE.lastIndex = 0;
+          if (!TERM_RE.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      const targets = [];
+      let n;
+      while ((n = walker.nextNode())) targets.push(n);
+      targets.forEach((textNode) => {
+        const text = textNode.nodeValue;
+        const frag = document.createDocumentFragment();
+        let last = 0;
+        TERM_RE.lastIndex = 0;
+        let match;
+        const seenInNode = new Set();
+        while ((match = TERM_RE.exec(text)) !== null) {
+          const matched = match[1];
+          const key = matched.toLowerCase();
+          if (seenInNode.has(key)) continue;
+          seenInNode.add(key);
+          if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+          const entry = TERMS[matched] || TERMS[Object.keys(TERMS).find((k) => k.toLowerCase() === key)];
+          if (!entry) { frag.appendChild(document.createTextNode(matched)); last = match.index + matched.length; continue; }
+          const span = document.createElement('span');
+          span.className = 't-term';
+          span.tabIndex = 0;
+          span.appendChild(document.createTextNode(matched));
+          const pop = document.createElement('span');
+          pop.className = 't-pop';
+          pop.setAttribute('role', 'tooltip');
+          pop.innerHTML = '<strong>' + matched + '</strong>' + entry.meaning +
+            '<span class="t-label">Why it matters</span>' + entry.why +
+            '<span class="t-label">Beginner action</span>' + entry.action;
+          span.appendChild(pop);
+          frag.appendChild(span);
+          last = match.index + matched.length;
+        }
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        textNode.parentNode.replaceChild(frag, textNode);
+      });
+    }
+
+    wrapTermsIn(document.getElementById('main'));
+  
+
+    /* ---------- Tab routing ---------- */
+    function setView(name) {
+      const valid = ['overview', 'bloat', 'drift'];
+      if (!valid.includes(name)) name = 'overview';
+      document.body.dataset.view = name;
+      document.querySelectorAll('.tab-nav a').forEach(function (a) {
+        const active = a.dataset.tab === name;
+        a.dataset.active = String(active);
+        a.setAttribute('aria-selected', String(active));
+      });
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function viewFromHash() {
+      const h = (location.hash || '').replace(/^#/, '').toLowerCase();
+      if (h === 'bloat' || h === 'drift' || h === 'overview') return h;
+      return null;
+    }
+
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a[data-view], a[data-tab]');
+      if (!link) return;
+      const target = link.dataset.tab || link.dataset.view;
+      if (!target) return;
+      const href = link.getAttribute('href') || '';
+      const hashIdx = href.indexOf('#');
+      const anchor = hashIdx >= 0 ? href.slice(hashIdx + 1) : '';
+      e.preventDefault();
+      setView(target);
+      if (anchor && anchor !== '' && anchor !== 'overview' && anchor !== 'bloat' && anchor !== 'drift') {
+        const el = document.getElementById(anchor);
+        if (el) {
+          requestAnimationFrame(function () { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        }
+      } else if (target === 'overview' || target === 'bloat' || target === 'drift') {
+        history.replaceState(null, '', '#' + target);
+      }
+    });
+
+    window.addEventListener('hashchange', function () {
+      const v = viewFromHash();
+      if (v) setView(v);
+    });
+
+    (function initRoute() {
+      const v = viewFromHash();
+      if (v) setView(v);
+    })();
+  </script>
+</body>
+</html>

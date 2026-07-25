@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Optimizer Workspace</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; line-height: 1.45; }
+    button, input, select { font: inherit; }
+    button, select { cursor: pointer; }
+    a { color: var(--cp-link); }
+    :focus-visible { outline: 3px solid var(--cp-accent); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip { position: fixed; top: -5rem; left: 1rem; z-index: 100; padding: .65rem .9rem; background: var(--cp-text); color: var(--cp-bg); border-radius: .625rem; }
+    .skip:focus { top: .75rem; }
+    .app-header { position: fixed; inset: 0 0 auto 0; z-index: 30; height: 4rem; display: grid; grid-template-columns: 16.5rem minmax(0,1fr) auto; align-items: center; gap: 1rem; padding: 0 1rem; border-bottom: 1px solid var(--cp-border); background: var(--cp-panel-strong); }
+    .brand-area, .brand { min-width: 0; display: flex; align-items: center; gap: .65rem; }
+    .brand { color: var(--cp-text); text-decoration: none; font-weight: 850; font-size: 1.05rem; }
+    .brand-mark { width: 2rem; height: 2rem; display: grid; place-items: center; flex: 0 0 auto; border-radius: .5rem; background: var(--cp-accent); color: var(--cp-accent-fg); font-size: .75rem; }
+    .header-search { width: min(32rem,100%); min-width: 0; position: relative; justify-self: end; }
+    .header-search input { width: 100%; min-width: 0; height: 2.5rem; padding: 0 2.3rem 0 .75rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface-soft); color: var(--cp-text); }
+    .header-search kbd { position: absolute; right: .55rem; top: .58rem; padding: .08rem .3rem; border: 1px solid var(--cp-border); border-radius: .3rem; color: var(--cp-text-muted); font: 11px Consolas, "Courier New", monospace; }
+    .header-actions { display: flex; align-items: center; gap: .4rem; }
+    .icon-btn, .quiet-btn, .primary-btn, .seg-btn, .action-btn { min-height: 2.5rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); color: var(--cp-text); font-weight: 700; }
+    .icon-btn { min-width: 2.5rem; padding: .4rem; }
+    .quiet-btn, .primary-btn, .action-btn { padding: .45rem .75rem; }
+    .primary-btn { border-color: var(--cp-accent); background: var(--cp-accent); color: var(--cp-accent-fg); }
+    .primary-btn:hover { background: var(--cp-accent-hover); }
+    .menu-btn { display: none; }
+    .layout { min-height: 100vh; padding-top: 4rem; display: grid; grid-template-columns: 16.5rem minmax(0,1fr); }
+    .sidebar { position: fixed; top: 4rem; bottom: 0; left: 0; z-index: 25; width: 16.5rem; overflow-y: auto; padding: 1rem .7rem; border-right: 1px solid var(--cp-border); background: var(--cp-bg-elevated); }
+    .persona-button { width: 100%; min-height: 3rem; display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .55rem .65rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface-soft); color: var(--cp-text); text-align: left; }
+    .persona-button small { display: block; color: var(--cp-text-muted); }
+    .persona-menu { margin-top: .35rem; padding: .35rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); box-shadow: var(--cp-shadow); }
+    .persona-menu[hidden] { display: none; }
+    .persona-menu button { width: 100%; min-height: 2.4rem; padding: .4rem .55rem; border: 0; border-radius: .45rem; background: transparent; color: var(--cp-text); text-align: left; }
+    .persona-menu button:hover { background: var(--cp-accent-soft); }
+    .nav-groups { margin-top: 1.1rem; display: grid; gap: 1.25rem; }
+    .nav-label { margin: 0 0 .3rem .55rem; color: var(--cp-text-soft); font-size: .68rem; font-weight: 850; text-transform: uppercase; }
+    .nav-group { display: grid; gap: .1rem; }
+    .nav-link { min-height: 2.35rem; display: grid; grid-template-columns: 1.3rem 1fr auto; align-items: center; gap: .45rem; padding: .4rem .55rem; border: 0; border-radius: .5rem; background: transparent; color: var(--cp-text-muted); text-align: left; text-decoration: none; }
+    .nav-link:hover, .nav-link[data-active="true"] { background: var(--cp-accent-soft); color: var(--cp-accent); }
+    .nav-icon { font-size: .86rem; text-align: center; }
+    .nav-badge { min-width: 1.3rem; padding: .05rem .3rem; border-radius: .35rem; background: var(--cp-accent-soft); color: var(--cp-accent); font-size: .68rem; text-align: center; }
+    .sidebar-foot { margin-top: 1.25rem; padding: .75rem; border: 1px solid var(--cp-border); border-radius: .625rem; color: var(--cp-text-muted); font-size: .75rem; }
+    .workspace { min-width: 0; grid-column: 2; padding: 1.5rem; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .eyebrow { margin: 0 0 .25rem; color: var(--cp-accent); font-size: .72rem; font-weight: 850; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: .25rem; font-size: clamp(1.65rem,3vw,2.25rem); line-height: 1.08; letter-spacing: 0; }
+    h2 { margin-bottom: .25rem; font-size: 1rem; letter-spacing: 0; }
+    h3 { margin-bottom: .25rem; font-size: .9rem; letter-spacing: 0; }
+    .page-copy, .muted { color: var(--cp-text-muted); }
+    .page-copy { margin: 0; }
+    .sample-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .5rem; border: 1px solid var(--cp-border); border-radius: .5rem; color: var(--cp-text-muted); font-size: .72rem; white-space: nowrap; }
+    .sample-chip::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--cp-warning); }
+    .filters { display: flex; flex-wrap: wrap; align-items: end; gap: .6rem; padding: .75rem; margin-bottom: 1rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); }
+    .field { min-width: 9rem; display: grid; gap: .2rem; }
+    .field label { color: var(--cp-text-muted); font-size: .7rem; font-weight: 750; }
+    .field select, .field input { min-height: 2.35rem; padding: .35rem .55rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-bg-elevated); color: var(--cp-text); }
+    .next-actions { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .65rem; margin-bottom: 1rem; }
+    .next-action { min-width: 0; min-height: 5.4rem; display: grid; grid-template-columns: 2rem 1fr; align-items: start; gap: .55rem; padding: .75rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); color: var(--cp-text); text-decoration: none; text-align: left; }
+    .next-action:hover { border-color: var(--cp-accent); }
+    .action-icon { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: .5rem; background: var(--cp-accent-soft); color: var(--cp-accent); font-weight: 900; }
+    .next-action strong, .next-action span { display: block; }
+    .next-action span { margin-top: .18rem; color: var(--cp-text-muted); font-size: .75rem; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); border: 1px solid var(--cp-border); border-radius: .625rem; overflow: hidden; background: var(--cp-surface); }
+    .kpi { min-width: 0; padding: .8rem; border-right: 1px solid var(--cp-border); }
+    .kpi:last-child { border-right: 0; }
+    .kpi-label { color: var(--cp-text-muted); font-size: .72rem; font-weight: 750; }
+    .kpi-value { margin: .3rem 0; font-size: 1.45rem; font-weight: 900; line-height: 1; }
+    .delta { color: var(--cp-success); font-size: .7rem; }
+    .delta.bad { color: var(--cp-danger); }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(18rem,.75fr); gap: .8rem; margin-top: .8rem; }
+    .panel { min-width: 0; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); }
+    .panel.wide { grid-column: 1 / -1; }
+    .panel-head { min-height: 3.6rem; display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .7rem .85rem; border-bottom: 1px solid var(--cp-border); }
+    .panel-head p { margin: .1rem 0 0; color: var(--cp-text-muted); font-size: .72rem; }
+    .panel-body { padding: .85rem; }
+    .segmented { display: flex; padding: .2rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-surface-soft); }
+    .seg-btn { min-height: 2rem; padding: .25rem .55rem; border: 0; background: transparent; color: var(--cp-text-muted); font-size: .72rem; }
+    .seg-btn[aria-pressed="true"] { background: var(--cp-surface); color: var(--cp-accent); box-shadow: 0 1px 2px var(--cp-border); }
+    .chart-wrap { min-height: 17rem; position: relative; }
+    .chart { width: 100%; height: 17rem; overflow: visible; }
+    .chart-grid { stroke: var(--cp-border); stroke-width: 1; }
+    .chart-area { fill: var(--cp-accent-soft); }
+    .chart-line { fill: none; stroke: var(--cp-accent); stroke-width: 3; vector-effect: non-scaling-stroke; }
+    .chart-dot { fill: var(--cp-surface); stroke: var(--cp-accent); stroke-width: 2; }
+    .chart-label { fill: var(--cp-text-muted); font-size: 11px; }
+    .chart-empty { min-height: 17rem; display: grid; place-items: center; color: var(--cp-text-muted); }
+    .composition { display: grid; gap: .8rem; }
+    .donut-row { display: grid; grid-template-columns: 8.5rem 1fr; align-items: center; gap: 1rem; }
+    .donut { width: 8.5rem; aspect-ratio: 1; position: relative; border-radius: 50%; background: conic-gradient(var(--cp-accent) 0 var(--input-end), var(--cp-link) var(--input-end) var(--cache-end), var(--cp-warning) var(--cache-end) 100%); }
+    .donut::after { content: ""; position: absolute; inset: 1.55rem; border-radius: 50%; background: var(--cp-surface); }
+    .donut-center { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; text-align: center; font-size: .72rem; }
+    .donut-center strong { display: block; font-size: 1.1rem; }
+    .legend-list { display: grid; gap: .55rem; }
+    .legend-item { display: grid; grid-template-columns: .65rem 1fr auto; align-items: center; gap: .45rem; }
+    .swatch { width: .65rem; height: .65rem; border-radius: .2rem; background: var(--cp-accent); }
+    .swatch.cache { background: var(--cp-link); }
+    .swatch.output { background: var(--cp-warning); }
+    .status-stack { display: grid; gap: .55rem; }
+    .status-row { min-height: 3.9rem; display: grid; grid-template-columns: 2.1rem minmax(0,1fr) auto; align-items: center; gap: .65rem; padding: .65rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-bg-elevated); }
+    .status-icon { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--cp-accent-soft); color: var(--cp-accent); font-weight: 900; }
+    .status-icon.ok { color: var(--cp-success); }
+    .status-row small { display: block; color: var(--cp-text-muted); }
+    .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+    .risk { padding: .75rem; border: 1px solid var(--cp-border); border-radius: .5rem; }
+    .risk-top { display: flex; justify-content: space-between; gap: .5rem; }
+    .risk-score { font-size: 1.45rem; font-weight: 900; }
+    .meter { height: .45rem; overflow: hidden; margin: .55rem 0; border-radius: .3rem; background: var(--cp-border); }
+    .meter span { display: block; height: 100%; background: var(--cp-warning); }
+    .opportunity-list, .alert-list { display: grid; gap: .5rem; }
+    .opportunity, .alert-item { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: .65rem; align-items: start; padding: .65rem 0; border-bottom: 1px solid var(--cp-border); }
+    .opportunity:last-child, .alert-item:last-child { border-bottom: 0; }
+    .impact { min-width: 4rem; padding: .2rem .35rem; border-radius: .35rem; background: var(--cp-accent-soft); color: var(--cp-accent); font-size: .7rem; font-weight: 850; text-align: center; }
+    .opportunity p, .alert-item p { margin: .18rem 0 0; color: var(--cp-text-muted); font-size: .75rem; }
+    .table-tools { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .table-tools input { min-height: 2.2rem; width: 12rem; padding: .35rem .55rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-bg-elevated); color: var(--cp-text); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    th, td { padding: .65rem .75rem; border-bottom: 1px solid var(--cp-border); text-align: right; white-space: nowrap; }
+    th { color: var(--cp-text-muted); font-size: .68rem; text-transform: uppercase; }
+    th:first-child, td:first-child { text-align: left; }
+    th button { border: 0; background: transparent; color: inherit; font: inherit; text-transform: inherit; }
+    .model-name { font-weight: 800; }
+    .model-name small { display: block; color: var(--cp-text-muted); font-weight: 400; }
+    .health { display: inline-block; padding: .18rem .4rem; border-radius: .35rem; background: var(--cp-accent-soft); color: var(--cp-accent); }
+    .health.good { color: var(--cp-success); }
+    .alert-template-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .55rem; }
+    .template { min-height: 6.3rem; padding: .7rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-bg-elevated); color: var(--cp-text); text-align: left; }
+    .template:hover { border-color: var(--cp-accent); }
+    .template span { display: block; margin-top: .25rem; color: var(--cp-text-muted); font-size: .72rem; }
+    .severity { width: .6rem; height: .6rem; margin-top: .32rem; border-radius: 50%; background: var(--cp-warning); }
+    .severity.high { background: var(--cp-danger); }
+    .severity.low { background: var(--cp-success); }
+    .empty { padding: 2rem; color: var(--cp-text-muted); text-align: center; }
+    .backdrop { position: fixed; inset: 0; z-index: 45; background: var(--cp-overlay); backdrop-filter: blur(4px); }
+    .backdrop[hidden] { display: none; }
+    dialog { width: min(50rem,calc(100vw - 2rem)); min-width: 0; max-width: calc(100vw - 2rem); max-height: calc(100vh - 2rem); overflow: auto; padding: 0; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); color: var(--cp-text); box-shadow: var(--cp-shadow); }
+    dialog::backdrop { background: var(--cp-overlay); backdrop-filter: blur(4px); }
+    .dialog-head, .dialog-foot { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .85rem 1rem; border-bottom: 1px solid var(--cp-border); }
+    .dialog-foot { border-top: 1px solid var(--cp-border); border-bottom: 0; }
+    .dialog-body { min-width: 0; padding: 1rem; }
+    .role-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .65rem; }
+    .role-card { min-width: 0; min-height: 11rem; padding: .85rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-bg-elevated); color: var(--cp-text); text-align: left; overflow-wrap: anywhere; }
+    .role-card[aria-pressed="true"] { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+    .role-card strong { display: block; margin: .6rem 0 .35rem; }
+    .role-card p { color: var(--cp-text-muted); font-size: .76rem; }
+    .wizard-steps { display: flex; gap: .4rem; margin-bottom: 1rem; }
+    .wizard-step { flex: 1; height: .35rem; border-radius: .3rem; background: var(--cp-border); }
+    .wizard-step.active { background: var(--cp-accent); }
+    .choice-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .55rem; }
+    .choice { min-height: 5.5rem; padding: .7rem; border: 1px solid var(--cp-border); border-radius: .5rem; background: var(--cp-bg-elevated); color: var(--cp-text); text-align: left; }
+    .choice[aria-pressed="true"] { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+    .customize-row { display: grid; grid-template-columns: 1fr auto auto; gap: .5rem; align-items: center; padding: .5rem 0; border-bottom: 1px solid var(--cp-border); }
+    .toast { position: fixed; right: 1rem; bottom: 1rem; z-index: 60; max-width: 22rem; padding: .7rem .9rem; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-panel-strong); color: var(--cp-text); box-shadow: var(--cp-shadow); }
+    .toast[hidden] { display: none; }
+    @media (max-width: 75rem) {
+      .kpi-grid { grid-template-columns: repeat(3,1fr); }
+      .kpi:nth-child(3) { border-right: 0; }
+      .kpi:nth-child(-n+3) { border-bottom: 1px solid var(--cp-border); }
+      .next-actions { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 58rem) {
+      .app-header { grid-template-columns: auto minmax(0,1fr) auto; }
+      .brand-name, .header-search kbd, #themeText { display: none; }
+      .menu-btn { display: inline-block; }
+      .layout { display: block; }
+      .sidebar { transform: translateX(-105%); transition: transform .2s ease; }
+      body.nav-open .sidebar { transform: translateX(0); }
+      .workspace { padding: 1rem; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .panel.wide { grid-column: auto; }
+      .alert-template-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 40rem) {
+      .app-header { gap: .45rem; padding: 0 .6rem; }
+      .header-actions { gap: .25rem; }
+      #personaHeaderButton { display: none; }
+      .page-head { display: grid; }
+      .filters { display: grid; grid-template-columns: 1fr 1fr; }
+      .field { min-width: 0; }
+      .next-actions, .kpi-grid, .role-grid, .choice-grid, .alert-template-grid, .risk-grid { grid-template-columns: 1fr; }
+      .kpi { border-right: 0; border-bottom: 1px solid var(--cp-border); }
+      .kpi:last-child { border-bottom: 0; }
+      .donut-row { grid-template-columns: 1fr; justify-items: center; }
+      .legend-list { width: 100%; }
+      .status-row { grid-template-columns: 2rem minmax(0,1fr); }
+      .status-row .quiet-btn { grid-column: 2; justify-self: start; }
+      .dialog-foot { flex-wrap: wrap; }
+      dialog { width: calc(100vw - 1rem); max-width: calc(100vw - 1rem); }
+      .dialog-body, .dialog-head, .dialog-foot { padding-left: .75rem; padding-right: .75rem; }
+      .dialog-foot .primary-btn { margin-left: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to dashboard</a>
+  <header class="app-header">
+    <div class="brand-area"><button class="icon-btn menu-btn" id="menuButton" type="button" aria-label="Open navigation" aria-expanded="false">&#9776;</button><a class="brand" href="#overview"><span class="brand-mark">TO</span><span class="brand-name">Token Optimizer</span></a></div>
+    <div class="header-search"><label class="sr-only" for="globalSearch">Search dashboard</label><input id="globalSearch" type="search" placeholder="Ask or search workspace..." autocomplete="off"><kbd>Ctrl K</kbd></div>
+    <div class="header-actions">
+      <button class="quiet-btn" id="personaHeaderButton" type="button">Cost &amp; Finance</button>
+      <button class="icon-btn" id="themeButton" type="button" aria-label="Toggle color theme"><span id="themeText">Theme</span></button>
+      <button class="icon-btn" type="button" title="Sample profile" aria-label="Open profile">BD</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <button class="persona-button" id="personaButton" type="button" aria-expanded="false"><span><strong id="personaName">Cost &amp; Finance</strong><small>Personalized workspace</small></span><span aria-hidden="true">&#8964;</span></button>
+      <div class="persona-menu" id="personaMenu" hidden>
+        <button type="button" data-command="persona">Change persona...</button>
+        <button type="button" data-command="show-all">Show all sections</button>
+        <button type="button" data-command="customize">Customize sidebar...</button>
+        <button type="button" data-command="reset-layout">Reset role defaults</button>
+      </div>
+      <nav class="nav-groups" id="navGroups" aria-label="Workspace navigation"></nav>
+      <div class="sidebar-foot"><strong>Sample workspace</strong><br>Illustrative telemetry only. No provider data is connected.</div>
+    </aside>
+
+    <main class="workspace" id="main">
+      <div class="page-head">
+        <div><p class="eyebrow">Personalized home</p><h1 id="pageTitle">Focus every AI dollar.</h1><p class="page-copy" id="pageCopy">See spend concentration, protect budgets, and act on the largest savings opportunities.</p></div>
+        <span class="sample-chip">Interactive sample data</span>
+      </div>
+
+      <section class="filters" aria-label="Dashboard filters">
+        <div class="field"><label for="rangeFilter">Date range</label><select id="rangeFilter"><option value="7">Last 7 days</option><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option></select></div>
+        <div class="field"><label for="teamFilter">Team</label><select id="teamFilter"><option value="all">All teams</option><option>Commerce</option><option>Platform</option><option>Support</option></select></div>
+        <div class="field"><label for="modelFilter">Model</label><select id="modelFilter"><option value="all">All models</option><option>GPT-5 mini</option><option>Claude Sonnet 4.6</option><option>Gemini 3 Flash</option><option>Claude Opus 4.7</option></select></div>
+        <button class="quiet-btn" id="resetFilters" type="button">Reset filters</button>
+      </section>
+
+      <section aria-labelledby="actionsTitle"><h2 class="sr-only" id="actionsTitle">What do you want to do?</h2><div class="next-actions" id="nextActions"></div></section>
+      <section class="kpi-grid" id="kpiGrid" aria-label="Key performance indicators"></section>
+
+      <div class="dashboard-grid">
+        <section class="panel" id="trends" aria-labelledby="trendTitle"><header class="panel-head"><div><h2 id="trendTitle">Cost and usage trend</h2><p id="trendSummary">Daily estimated spend</p></div><div class="segmented" aria-label="Chart metric"><button class="seg-btn" type="button" data-chart="spend" aria-pressed="true">Spend</button><button class="seg-btn" type="button" data-chart="tokens" aria-pressed="false">Tokens</button></div></header><div class="panel-body chart-wrap" id="trendChart"></div></section>
+        <section class="panel" id="token-composition" aria-labelledby="compositionTitle"><header class="panel-head"><div><h2 id="compositionTitle">Token composition</h2><p>Where context volume is going</p></div></header><div class="panel-body composition" id="composition"></div></section>
+
+        <section class="panel" id="connections" aria-labelledby="connectionsTitle"><header class="panel-head"><div><h2 id="connectionsTitle">Connection &amp; setup status</h2><p>What is already wired up</p></div></header><div class="panel-body status-stack" id="connectionStatus"></div></section>
+        <section class="panel" id="quality" aria-labelledby="qualityTitle"><header class="panel-head"><div><h2 id="qualityTitle">Prompt quality risk</h2><p>Bloat and Drift signals</p></div><a href="guide.html#overview:scores">Open guide</a></header><div class="panel-body risk-grid" id="riskGrid"></div></section>
+
+        <section class="panel" id="opportunities" aria-labelledby="opportunitiesTitle"><header class="panel-head"><div><h2 id="opportunitiesTitle">Savings opportunities</h2><p>Ranked by estimated monthly impact</p></div></header><div class="panel-body opportunity-list" id="opportunityList"></div></section>
+        <section class="panel" id="activity" aria-labelledby="activityTitle"><header class="panel-head"><div><h2 id="activityTitle">Alerts &amp; activity</h2><p>Signals that need attention</p></div><div class="segmented" aria-label="Alert severity"><button class="seg-btn" type="button" data-severity="all" aria-pressed="true">All</button><button class="seg-btn" type="button" data-severity="high" aria-pressed="false">High</button></div></header><div class="panel-body alert-list" id="alertList"></div></section>
+
+        <section class="panel wide" id="models" aria-labelledby="modelsTitle"><header class="panel-head"><div><h2 id="modelsTitle">Model cost &amp; usage</h2><p>Compare routing efficiency across the selected period</p></div><div class="table-tools"><label class="sr-only" for="modelSearch">Filter models</label><input id="modelSearch" type="search" placeholder="Filter models..."></div></header><div class="table-wrap"><table><thead><tr><th><button type="button" data-sort="name">Model</button></th><th><button type="button" data-sort="spend">Spend</button></th><th><button type="button" data-sort="requests">Requests</button></th><th><button type="button" data-sort="tokens">Tokens</button></th><th><button type="button" data-sort="perRequest">Cost / request</button></th><th>Status</th></tr></thead><tbody id="modelRows"></tbody></table></div></section>
+
+        <section class="panel wide" id="alerts" aria-labelledby="templatesTitle"><header class="panel-head"><div><h2 id="templatesTitle">Start from one-click alert templates</h2><p>Templates are ordered for your current persona</p></div></header><div class="panel-body alert-template-grid" id="alertTemplates"></div></section>
+      </div>
+    </main>
+  </div>
+
+  <div class="backdrop" id="mobileBackdrop" hidden></div>
+
+  <dialog id="personaDialog" aria-labelledby="personaDialogTitle">
+    <header class="dialog-head"><div><p class="eyebrow">Personalize your workspace</p><h2 id="personaDialogTitle">What is your main goal?</h2></div></header>
+    <div class="dialog-body"><p class="muted">Choose how you work. This changes only your local view, not permissions or shared data.</p><div class="role-grid" id="roleGrid"></div></div>
+    <footer class="dialog-foot"><button class="quiet-btn" id="skipPersona" type="button">Explore first</button><button class="primary-btn" id="continuePersona" type="button">Continue</button></footer>
+  </dialog>
+
+  <dialog id="setupDialog" aria-labelledby="setupTitle">
+    <header class="dialog-head"><div><p class="eyebrow">Guided setup</p><h2 id="setupTitle">Connect an AI assistant</h2></div><button class="icon-btn" type="button" data-close-dialog="setupDialog" aria-label="Close setup">&times;</button></header>
+    <div class="dialog-body"><div class="wizard-steps" id="wizardSteps"></div><div id="wizardContent"></div></div>
+    <footer class="dialog-foot"><button class="quiet-btn" id="wizardBack" type="button">Back</button><button class="primary-btn" id="wizardNext" type="button">Next</button></footer>
+  </dialog>
+
+  <dialog id="customizeDialog" aria-labelledby="customizeTitle">
+    <header class="dialog-head"><h2 id="customizeTitle">Customize sidebar</h2><button class="icon-btn" type="button" data-close-dialog="customizeDialog" aria-label="Close customization">&times;</button></header>
+    <div class="dialog-body"><p class="muted">Show, hide, or reorder sections. Preferences stay in this browser.</p><div id="customizeList"></div></div>
+    <footer class="dialog-foot"><button class="quiet-btn" id="resetCustomize" type="button">Role defaults</button><button class="primary-btn" id="saveCustomize" type="button">Save layout</button></footer>
+  </dialog>
+
+  <dialog id="alertDialog" aria-labelledby="alertDialogTitle">
+    <header class="dialog-head"><h2 id="alertDialogTitle">Create sample alert</h2><button class="icon-btn" type="button" data-close-dialog="alertDialog" aria-label="Close alert builder">&times;</button></header>
+    <div class="dialog-body"><div class="field"><label for="alertName">Alert name</label><input id="alertName"></div><div class="field"><label for="alertThreshold">Threshold</label><input id="alertThreshold" type="number" min="1" value="20"></div><div class="field"><label for="alertChannel">Notification</label><select id="alertChannel"><option>Email</option><option>Slack</option><option>Dashboard only</option></select></div></div>
+    <footer class="dialog-foot"><span class="muted">Creates a local sample alert only.</span><button class="primary-btn" id="createAlert" type="button">Create alert</button></footer>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script>
+    const STORAGE_KEY = 'token-dashboard-state-v1';
+    const PERSONAS = {
+      finance: {
+        name: 'Cost & Finance', icon: '$', title: 'Focus every AI dollar.',
+        copy: 'See spend concentration, protect budgets, and act on the largest savings opportunities.',
+        best: 'Budgets, savings, billing signals, and alerts',
+        kpis: ['spend','savings','cache','tokens','bloat','drift'],
+        nav: ['overview','costs','models','quality','alerts','connections'],
+        actions: [['Why did spend change?','Inspect daily cost drivers','trends'],['Find savings','Open ranked opportunities','opportunities'],['Set a budget alert','Start from a template','alerts'],['Compare models','Review routing efficiency','models']],
+        templates: ['Spend jump','Monthly spend cap','Model cost spike','Token surge','Cache regression','Drift regression']
+      },
+      product: {
+        name: 'Product & AI Leaders', icon: 'P', title: 'Build AI products with unit economics.',
+        copy: 'Balance adoption, model quality, and spend across teams and product workloads.',
+        best: 'Adoption, unit economics, product quality, and model mix',
+        kpis: ['tokens','spend','drift','bloat','cache','savings'],
+        nav: ['overview','models','quality','costs','alerts','connections'],
+        actions: [['Measure adoption','See usage by team','models'],['Review unit cost','Compare cost per request','models'],['Inspect quality','Open Bloat and Drift risk','quality'],['Improve prompts','Launch Prompt Guide','Prompt Guide.html']],
+        templates: ['Token surge','Drift regression','Model cost spike','Spend jump','Error rate rise','Monthly spend cap']
+      },
+      engineering: {
+        name: 'Platform & Engineering', icon: 'E', title: 'Common metrics and efficient services at scale.',
+        copy: 'Track assistants, performance, prompt quality, and the connections that keep teams productive.',
+        best: 'Assistant usage, performance, teams, and data connections',
+        kpis: ['tokens','cache','bloat','drift','spend','savings'],
+        nav: ['overview','connections','quality','models','costs','alerts'],
+        actions: [['Connect an assistant','Start guided setup','setup'],['Reduce context bloat','Inspect highest-risk work','quality'],['Compare model routing','Review usage by model','models'],['Open documentation','Read optimization guidance','docs.html']],
+        templates: ['Cache regression','Error rate rise','Bloat regression','Token surge','Drift regression','Spend jump']
+      }
+    };
+    const NAV_ITEMS = {
+      overview: ['Home','&#9632;','overview'], costs: ['Costs & savings','$','trends'], models: ['Models & adoption','M','models'],
+      quality: ['Bloat & Drift','Q','quality'], alerts: ['Budgets & alerts','!','alerts'], connections: ['Connections & setup','+','connections']
+    };
+    const MODEL_META = {
+      'GPT-5 mini': { vendor: 'OpenAI', input: .25, output: 2 },
+      'Claude Sonnet 4.6': { vendor: 'Anthropic', input: 3, output: 15 },
+      'Gemini 3 Flash': { vendor: 'Google', input: .3, output: 3 },
+      'Claude Opus 4.7': { vendor: 'Anthropic', input: 15, output: 75 }
+    };
+    const TEAMS = ['Commerce','Platform','Support'];
+    const MODELS = Object.keys(MODEL_META);
+    const ALERT_COPY = {
+      'Spend jump': 'Notify when daily spend rises more than 20% week over week.',
+      'Monthly spend cap': 'Warn before estimated monthly spend crosses a set amount.',
+      'Model cost spike': 'Detect a sudden increase in cost per request for one model.',
+      'Token surge': 'Flag unusual input or output token growth.',
+      'Cache regression': 'Alert when cached-input share falls below its baseline.',
+      'Drift regression': 'Flag a sustained increase in AI Drift Score.',
+      'Bloat regression': 'Flag a sustained increase in Bloat Score.',
+      'Error rate rise': 'Detect a workload error-rate increase.'
+    };
+
+    function generateSampleData() {
+      const rows = [];
+      for (let day = 0; day < 30; day += 1) {
+        TEAMS.forEach((team, teamIndex) => MODELS.forEach((model, modelIndex) => {
+          const wave = 1 + Math.sin((day + teamIndex * 2 + modelIndex) / 3) * .18;
+          const requests = Math.round((85 + teamIndex * 31 + modelIndex * 18) * wave);
+          const input = Math.round(requests * (1800 + teamIndex * 480 + modelIndex * 210));
+          const cached = Math.round(input * (.24 + ((day + modelIndex) % 5) * .055));
+          const output = Math.round(requests * (330 + modelIndex * 95));
+          const rates = MODEL_META[model];
+          const spend = ((input - cached) * rates.input + cached * rates.input * .1 + output * rates.output) / 1e6;
+          rows.push({ day, team, model, requests, input, cached, output, spend,
+            bloat: Math.round(27 + teamIndex * 7 + modelIndex * 3 + Math.sin(day / 4) * 8),
+            drift: Math.round(22 + teamIndex * 5 + modelIndex * 2 + Math.cos(day / 5) * 7),
+            latency: Math.round(680 + modelIndex * 420 + teamIndex * 80), errors: ((day + modelIndex * 2) % 17 === 0 ? 3.8 : 1.2 + teamIndex * .3) });
+        }));
+      }
+      return rows;
+    }
+    const SAMPLE_DATA = generateSampleData();
+    const defaultState = () => ({ persona: 'finance', onboarded: false, range: 30, team: 'all', model: 'all', chart: 'spend', severity: 'all', modelSearch: '', sort: 'spend', sortDir: -1, showAll: false, navOrder: null, hiddenNav: [], connectedAssistant: false, alertCount: 3, dismissedAlerts: [], createdAlerts: [] });
+    let state = loadState();
+    let pendingPersona = state.persona;
+    let wizard = { step: 0, pricing: '', assistant: '', method: '' };
+    let activeAlertTemplate = '';
+
+    function loadState() {
+      try { return { ...defaultState(), ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') }; }
+      catch { return defaultState(); }
+    }
+    function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {} }
+    function el(id) { return document.getElementById(id); }
+    function money(value) { return '$' + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function compact(value) { return Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }).format(value); }
+    function toast(message) { const node = el('toast'); node.textContent = message; node.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => node.hidden = true, 2600); }
+
+    function getFilteredData() {
+      return SAMPLE_DATA.filter(row => row.day >= 30 - Number(state.range) && (state.team === 'all' || row.team === state.team) && (state.model === 'all' || row.model === state.model));
+    }
+    function aggregate(rows) {
+      const result = rows.reduce((acc, row) => {
+        ['requests','input','cached','output','spend','bloat','drift'].forEach(key => acc[key] += row[key]);
+        return acc;
+      }, { requests:0,input:0,cached:0,output:0,spend:0,bloat:0,drift:0 });
+      result.tokens = result.input + result.output;
+      result.cache = result.input ? result.cached / result.input * 100 : 0;
+      result.bloat = rows.length ? result.bloat / rows.length : 0;
+      result.drift = rows.length ? result.drift / rows.length : 0;
+      result.savings = result.spend * (.08 + Math.max(0, 45 - result.cache) / 250 + result.bloat / 900);
+      return result;
+    }
+    function groupBy(rows, key) {
+      return rows.reduce((map, row) => { const name = row[key]; (map[name] ||= []).push(row); return map; }, {});
+    }
+
+    function renderNavigation() {
+      const persona = PERSONAS[state.persona];
+      const order = state.navOrder || persona.nav;
+      const visible = state.showAll ? Object.keys(NAV_ITEMS) : order.filter(id => !state.hiddenNav.includes(id));
+      el('navGroups').innerHTML = '<div class="nav-group"><p class="nav-label">Workspace</p>' + visible.map((id, index) => {
+        const item = NAV_ITEMS[id];
+        return `<a class="nav-link" href="#${item[2]}" data-nav="${id}" data-active="${index === 0}"><span class="nav-icon">${item[1]}</span><span>${item[0]}</span>${id === 'alerts' ? `<span class="nav-badge">${state.alertCount}</span>` : ''}</a>`;
+      }).join('') + '</div><div class="nav-group"><p class="nav-label">Learn & tools</p><a class="nav-link" href="docs.html"><span class="nav-icon">?</span><span>Documentation</span></a><a class="nav-link" href="Prompt Guide.html"><span class="nav-icon">P</span><span>Prompt Guide</span></a></div>';
+      el('personaName').textContent = persona.name;
+      el('personaHeaderButton').textContent = persona.name;
+    }
+
+    function renderActions() {
+      el('nextActions').innerHTML = PERSONAS[state.persona].actions.map((action, index) => {
+        const external = action[2].endsWith('.html');
+        const href = external ? action[2] : `#${action[2]}`;
+        return `<a class="next-action" href="${href}" ${action[2] === 'setup' ? 'data-open-setup="true"' : ''}><span class="action-icon">${index + 1}</span><span><strong>${action[0]}</strong><span>${action[1]}</span></span></a>`;
+      }).join('');
+    }
+
+    const KPI = {
+      spend: ['Estimated spend', a => money(a.spend), 'Down 6.4% vs prior period'],
+      savings: ['Savings opportunity', a => money(a.savings), 'Across five optimization levers'],
+      cache: ['Cache hit rate', a => a.cache.toFixed(1) + '%', 'Up 3.2 points'],
+      tokens: ['Total tokens', a => compact(a.tokens), 'Input plus generated output'],
+      bloat: ['Avg Bloat Score', a => Math.round(a.bloat), 'Lower is better'],
+      drift: ['Avg Drift Score', a => Math.round(a.drift), 'Lower is better']
+    };
+    function renderKpis(summary) {
+      el('kpiGrid').innerHTML = PERSONAS[state.persona].kpis.map(id => `<article class="kpi"><div class="kpi-label">${KPI[id][0]}</div><div class="kpi-value">${KPI[id][1](summary)}</div><div class="delta ${id === 'bloat' || id === 'drift' ? 'bad' : ''}">${KPI[id][2]}</div></article>`).join('');
+    }
+
+    function renderTrend(rows) {
+      const grouped = groupBy(rows, 'day');
+      const points = Object.keys(grouped).sort((a,b) => a-b).map(day => ({ day: Number(day), value: state.chart === 'spend' ? aggregate(grouped[day]).spend : aggregate(grouped[day]).tokens }));
+      if (!points.length) { el('trendChart').innerHTML = '<div class="chart-empty">No data for these filters.</div>'; return; }
+      const max = Math.max(...points.map(point => point.value), 1);
+      const coords = points.map((point, index) => ({ ...point, x: 45 + index * (710 / Math.max(1, points.length - 1)), y: 220 - point.value / max * 175 }));
+      const line = coords.map(point => `${point.x},${point.y}`).join(' ');
+      const area = `45,220 ${line} ${coords.at(-1).x},220`;
+      const label = state.chart === 'spend' ? money : compact;
+      el('trendSummary').textContent = state.chart === 'spend' ? 'Daily estimated spend' : 'Daily token volume';
+      el('trendChart').innerHTML = `<svg class="chart" viewBox="0 0 780 250" role="img" aria-label="${state.chart} trend for selected period"><line class="chart-grid" x1="45" x2="755" y1="45" y2="45"/><line class="chart-grid" x1="45" x2="755" y1="132" y2="132"/><line class="chart-grid" x1="45" x2="755" y1="220" y2="220"/><text class="chart-label" x="4" y="49">${label(max)}</text><text class="chart-label" x="4" y="224">0</text><polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>${coords.map(point => `<circle class="chart-dot" cx="${point.x}" cy="${point.y}" r="4"><title>Day ${point.day + 1}: ${label(point.value)}</title></circle>`).join('')}<text class="chart-label" x="45" y="243">Day ${coords[0].day + 1}</text><text class="chart-label" x="710" y="243">Day ${coords.at(-1).day + 1}</text></svg>`;
+    }
+
+    function renderComposition(summary) {
+      const total = summary.input + summary.output || 1;
+      const uncached = Math.max(0, summary.input - summary.cached);
+      const inputPct = uncached / total * 100;
+      const cachePct = summary.cached / total * 100;
+      const outputPct = summary.output / total * 100;
+      el('composition').innerHTML = `<div class="donut-row"><div class="donut" style="--input-end:${inputPct}%;--cache-end:${inputPct + cachePct}%"><div class="donut-center"><strong>${compact(total)}</strong>tokens</div></div><div class="legend-list"><div class="legend-item"><i class="swatch"></i><span>Input</span><strong>${inputPct.toFixed(1)}%</strong></div><div class="legend-item"><i class="swatch cache"></i><span>Cached input</span><strong>${cachePct.toFixed(1)}%</strong></div><div class="legend-item"><i class="swatch output"></i><span>Output</span><strong>${outputPct.toFixed(1)}%</strong></div></div></div><p class="muted">Increase stable cached context and constrain generated output to improve the mix.</p>`;
+    }
+
+    function renderConnections() {
+      const items = [
+        [state.connectedAssistant ? 'Assistant connected' : 'Connect an AI assistant', state.connectedAssistant ? 'GitHub Copilot sample telemetry ready' : 'No assistant usage source configured', state.connectedAssistant ? 'Connected' : 'Set up', state.connectedAssistant ? 'ok' : ''],
+        ['Sample telemetry', '30 days of generated workspace activity', 'Receiving', 'ok'],
+        ['Active alerts', `${state.alertCount} local sample alerts`, 'View', 'ok'],
+        ['Team access', '12 sample colleagues represented', 'Manage', 'ok']
+      ];
+      el('connectionStatus').innerHTML = items.map((item,index) => `<div class="status-row"><span class="status-icon ${item[3]}">${item[3] ? '&#10003;' : '+'}</span><span><strong>${item[0]}</strong><small>${item[1]}</small></span><button class="quiet-btn" type="button" ${index === 0 && !state.connectedAssistant ? 'data-open-setup="true"' : ''}>${item[2]}</button></div>`).join('');
+    }
+
+    function renderRisk(summary, rows) {
+      const byTeam = Object.entries(groupBy(rows, 'team')).map(([team, teamRows]) => [team, aggregate(teamRows)]).sort((a,b) => (b[1].bloat + b[1].drift) - (a[1].bloat + a[1].drift));
+      const highest = byTeam[0]?.[0] || 'No team';
+      const risks = [['Bloat Score',summary.bloat,'Unnecessary context',highest],['AI Drift Score',summary.drift,'Off-target answer risk',highest]];
+      el('riskGrid').innerHTML = risks.map(risk => `<article class="risk"><div class="risk-top"><div><h3>${risk[0]}</h3><span class="muted">${risk[2]}</span></div><span class="risk-score">${Math.round(risk[1])}</span></div><div class="meter"><span style="width:${Math.min(100,risk[1])}%"></span></div><small class="muted">Highest combined risk: ${risk[3]}</small></article>`).join('');
+    }
+
+    function renderOpportunities(summary) {
+      const opportunities = [
+        ['Increase cache reuse', summary.spend * Math.max(.03,(45-summary.cache)/180), `Cache rate is ${summary.cache.toFixed(1)}%. Stabilize shared instruction prefixes.`],
+        ['Route routine work lighter', summary.spend * .07, 'Move formatting, boilerplate, and simple edits to lightweight models.'],
+        ['Reduce generated output', summary.spend * .045, 'Ask for patches, tables, or short summaries when explanation is not required.'],
+        ['Trim stale context', summary.spend * summary.bloat / 700, `Average Bloat Score is ${Math.round(summary.bloat)}. Reset sessions at task boundaries.`]
+      ].sort((a,b) => b[1]-a[1]);
+      el('opportunityList').innerHTML = opportunities.map(item => `<div class="opportunity"><span class="impact">${money(item[1])}</span><span><strong>${item[0]}</strong><p>${item[2]}</p></span><a href="guide.html">Guide</a></div>`).join('');
+    }
+
+    function baseAlerts(rows) {
+      const summary = aggregate(rows);
+      return [
+        { id:'cost', severity:'high', title:'Daily spend is above baseline', detail:`Estimated period spend is ${money(summary.spend)}. Review model concentration.` },
+        { id:'cache', severity:'medium', title:'Cache reuse can improve', detail:`Cached-input share is ${summary.cache.toFixed(1)}%. Target at least 45%.` },
+        { id:'drift', severity:'medium', title:'Support workload drift increased', detail:'Several sample sessions combined stale history with multiple goals.' },
+        { id:'connected', severity:'low', title:'Sample telemetry is current', detail:'All generated records passed the latest local refresh.' }
+      ];
+    }
+    function renderAlerts(rows) {
+      const alerts = [...baseAlerts(rows), ...state.createdAlerts].filter(item => !state.dismissedAlerts.includes(item.id) && (state.severity === 'all' || item.severity === state.severity));
+      el('alertList').innerHTML = alerts.length ? alerts.map(item => `<div class="alert-item"><i class="severity ${item.severity}"></i><span><strong>${item.title}</strong><p>${item.detail}</p></span><button class="icon-btn" type="button" data-dismiss-alert="${item.id}" aria-label="Dismiss ${item.title}">&times;</button></div>`).join('') : '<div class="empty">No alerts match this filter.</div>';
+    }
+
+    function modelSummaries(rows) {
+      return Object.entries(groupBy(rows, 'model')).map(([name, modelRows]) => { const a = aggregate(modelRows); return { name, vendor: MODEL_META[name].vendor, ...a, perRequest: a.requests ? a.spend / a.requests : 0 }; });
+    }
+    function renderModels(rows) {
+      let models = modelSummaries(rows).filter(model => model.name.toLowerCase().includes(state.modelSearch.toLowerCase()));
+      models.sort((a,b) => { const left = a[state.sort], right = b[state.sort]; return typeof left === 'string' ? left.localeCompare(right) * state.sortDir : (left-right) * state.sortDir; });
+      el('modelRows').innerHTML = models.length ? models.map(model => `<tr><td><span class="model-name">${model.name}<small>${model.vendor}</small></span></td><td>${money(model.spend)}</td><td>${compact(model.requests)}</td><td>${compact(model.tokens)}</td><td>${money(model.perRequest)}</td><td><span class="health ${model.cache > 38 ? 'good' : ''}">${model.cache > 38 ? 'Efficient' : 'Review cache'}</span></td></tr>`).join('') : '<tr><td colspan="6" class="empty">No models match.</td></tr>';
+    }
+
+    function renderTemplates() {
+      el('alertTemplates').innerHTML = PERSONAS[state.persona].templates.map(name => `<button class="template" type="button" data-alert-template="${name}"><strong>${name}</strong><span>${ALERT_COPY[name]}</span></button>`).join('');
+    }
+
+    function renderDashboard() {
+      const persona = PERSONAS[state.persona];
+      const rows = getFilteredData();
+      const summary = aggregate(rows);
+      el('pageTitle').textContent = persona.title;
+      el('pageCopy').textContent = persona.copy;
+      el('rangeFilter').value = String(state.range); el('teamFilter').value = state.team; el('modelFilter').value = state.model; el('modelSearch').value = state.modelSearch;
+      renderNavigation(); renderActions(); renderKpis(summary); renderTrend(rows); renderComposition(summary); renderConnections(); renderRisk(summary, rows); renderOpportunities(summary); renderAlerts(rows); renderModels(rows); renderTemplates();
+      document.querySelectorAll('[data-chart]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.chart === state.chart)));
+      document.querySelectorAll('[data-severity]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.severity === state.severity)));
+      saveState();
+    }
+
+    function renderRoles() {
+      el('roleGrid').innerHTML = Object.entries(PERSONAS).map(([id, role]) => `<button class="role-card" type="button" data-role="${id}" aria-pressed="${id === pendingPersona}"><span class="action-icon">${role.icon}</span><strong>${role.name}</strong><p>${role.best}</p></button>`).join('');
+    }
+    function openPersonaDialog() { pendingPersona = state.persona; renderRoles(); el('personaDialog').showModal(); }
+    function choosePersona(id) { pendingPersona = id; document.querySelectorAll('[data-role]').forEach(card => card.setAttribute('aria-pressed', String(card.dataset.role === id))); }
+
+    function renderWizard() {
+      el('wizardSteps').innerHTML = [0,1,2].map(step => `<i class="wizard-step ${step <= wizard.step ? 'active' : ''}"></i>`).join('');
+      const configs = [
+        { title:'How do you pay?', choices:[['subscription','Subscription / seat','Keep an API-equivalent estimate'],['api','API rates','Count usage as estimated spend']] },
+        { title:'Pick an assistant', choices:[['GitHub Copilot','GitHub Copilot','Coding assistant usage'],['Claude Code','Claude Code','CLI and managed settings'],['Cursor','Cursor','Editor usage'],['Gemini CLI','Gemini CLI','CLI usage'],['Codex CLI','Codex CLI','CLI usage']] },
+        { title:'Choose collection method', choices:[['managed','Managed settings','Configure through an admin console'],['developer','Developer setup','Install settings per developer'],['sync','Admin API sync','Schedule organization usage sync']] }
+      ];
+      const config = configs[wizard.step]; const selected = [wizard.pricing,wizard.assistant,wizard.method][wizard.step];
+      el('wizardContent').innerHTML = `<h3>${config.title}</h3><p class="muted">This demo updates local sample state only.</p><div class="choice-grid">${config.choices.map(choice => `<button class="choice" type="button" data-wizard-choice="${choice[0]}" aria-pressed="${selected === choice[0]}"><strong>${choice[1]}</strong><span class="muted">${choice[2]}</span></button>`).join('')}</div>`;
+      el('wizardBack').disabled = wizard.step === 0; el('wizardNext').textContent = wizard.step === 2 ? 'Complete setup' : 'Next';
+    }
+    function openSetup() { wizard = { step:0, pricing:'', assistant:'', method:'' }; renderWizard(); el('setupDialog').showModal(); }
+
+    function renderCustomize() {
+      const order = [...(state.navOrder || PERSONAS[state.persona].nav)];
+      el('customizeList').innerHTML = order.map((id,index) => `<div class="customize-row" data-custom-id="${id}"><label><input type="checkbox" ${state.hiddenNav.includes(id) ? '' : 'checked'}> ${NAV_ITEMS[id][0]}</label><button class="icon-btn" type="button" data-move="up" ${index===0?'disabled':''} aria-label="Move ${NAV_ITEMS[id][0]} up">&#8593;</button><button class="icon-btn" type="button" data-move="down" ${index===order.length-1?'disabled':''} aria-label="Move ${NAV_ITEMS[id][0]} down">&#8595;</button></div>`).join('');
+    }
+
+    el('rangeFilter').addEventListener('change', event => { state.range = Number(event.target.value); renderDashboard(); });
+    el('teamFilter').addEventListener('change', event => { state.team = event.target.value; renderDashboard(); });
+    el('modelFilter').addEventListener('change', event => { state.model = event.target.value; renderDashboard(); });
+    el('resetFilters').addEventListener('click', () => { Object.assign(state,{range:30,team:'all',model:'all'}); renderDashboard(); });
+    el('modelSearch').addEventListener('input', event => { state.modelSearch = event.target.value; renderModels(getFilteredData()); saveState(); });
+    document.querySelectorAll('th button[data-sort]').forEach(button => button.addEventListener('click', () => { state.sortDir = state.sort === button.dataset.sort ? -state.sortDir : -1; state.sort = button.dataset.sort; renderModels(getFilteredData()); saveState(); }));
+    document.addEventListener('click', event => {
+      const chart = event.target.closest('[data-chart]'); if (chart) { state.chart = chart.dataset.chart; renderDashboard(); }
+      const severity = event.target.closest('[data-severity]'); if (severity) { state.severity = severity.dataset.severity; renderDashboard(); }
+      const role = event.target.closest('[data-role]'); if (role) choosePersona(role.dataset.role);
+      const setup = event.target.closest('[data-open-setup]'); if (setup) { event.preventDefault(); openSetup(); }
+      const dismiss = event.target.closest('[data-dismiss-alert]'); if (dismiss) { state.dismissedAlerts.push(dismiss.dataset.dismissAlert); renderDashboard(); }
+      const template = event.target.closest('[data-alert-template]'); if (template) { activeAlertTemplate = template.dataset.alertTemplate; el('alertName').value = activeAlertTemplate; el('alertDialog').showModal(); }
+      const close = event.target.closest('[data-close-dialog]'); if (close) el(close.dataset.closeDialog).close();
+      const choice = event.target.closest('[data-wizard-choice]'); if (choice) { if (wizard.step===0) wizard.pricing=choice.dataset.wizardChoice; if (wizard.step===1) wizard.assistant=choice.dataset.wizardChoice; if (wizard.step===2) wizard.method=choice.dataset.wizardChoice; renderWizard(); }
+      const nav = event.target.closest('[data-nav]'); if (nav) { document.querySelectorAll('[data-nav]').forEach(link => link.dataset.active = String(link===nav)); document.body.classList.remove('nav-open'); el('mobileBackdrop').hidden=true; }
+    });
+
+    el('continuePersona').addEventListener('click', () => { state.persona=pendingPersona; state.onboarded=true; state.navOrder=null; state.hiddenNav=[]; el('personaDialog').close(); renderDashboard(); toast(`Workspace personalized for ${PERSONAS[state.persona].name}.`); });
+    el('skipPersona').addEventListener('click', () => { state.onboarded=true; el('personaDialog').close(); renderDashboard(); });
+    el('personaHeaderButton').addEventListener('click', openPersonaDialog);
+    el('personaButton').addEventListener('click', () => { const menu=el('personaMenu'); menu.hidden=!menu.hidden; el('personaButton').setAttribute('aria-expanded',String(!menu.hidden)); });
+    el('personaMenu').addEventListener('click', event => {
+      const command=event.target.dataset.command; if(!command) return; el('personaMenu').hidden=true;
+      if(command==='persona') openPersonaDialog();
+      if(command==='show-all') { state.showAll=!state.showAll; renderDashboard(); toast(state.showAll?'Showing all sections.':'Using personalized sections.'); }
+      if(command==='customize') { renderCustomize(); el('customizeDialog').showModal(); }
+      if(command==='reset-layout') { state.navOrder=null; state.hiddenNav=[]; state.showAll=false; renderDashboard(); toast('Role defaults restored.'); }
+    });
+    el('customizeList').addEventListener('click', event => { const button=event.target.closest('[data-move]'); if(!button) return; const row=button.closest('[data-custom-id]'); const sibling=button.dataset.move==='up'?row.previousElementSibling:row.nextElementSibling; if(sibling) row.parentNode.insertBefore(button.dataset.move==='up'?row:sibling,button.dataset.move==='up'?sibling:row); renderCustomizeButtons(); });
+    function renderCustomizeButtons(){ const rows=[...el('customizeList').children]; rows.forEach((row,index)=>{row.querySelector('[data-move="up"]').disabled=index===0;row.querySelector('[data-move="down"]').disabled=index===rows.length-1;}); }
+    el('saveCustomize').addEventListener('click',()=>{const rows=[...el('customizeList').children];state.navOrder=rows.map(row=>row.dataset.customId);state.hiddenNav=rows.filter(row=>!row.querySelector('input').checked).map(row=>row.dataset.customId);el('customizeDialog').close();renderDashboard();toast('Sidebar layout saved.');});
+    el('resetCustomize').addEventListener('click',()=>{state.navOrder=null;state.hiddenNav=[];renderCustomize();});
+    el('wizardBack').addEventListener('click',()=>{if(wizard.step>0){wizard.step-=1;renderWizard();}});
+    el('wizardNext').addEventListener('click',()=>{const value=[wizard.pricing,wizard.assistant,wizard.method][wizard.step];if(!value){toast('Choose an option to continue.');return;}if(wizard.step<2){wizard.step+=1;renderWizard();return;}state.connectedAssistant=true;el('setupDialog').close();renderDashboard();toast(`${wizard.assistant} sample connection completed.`);});
+    el('createAlert').addEventListener('click',()=>{const name=el('alertName').value.trim()||activeAlertTemplate;state.createdAlerts.push({id:'custom-'+Date.now(),severity:'low',title:name,detail:`Local ${el('alertChannel').value} alert at threshold ${el('alertThreshold').value}.`});state.alertCount+=1;el('alertDialog').close();renderDashboard();toast('Sample alert created.');});
+    el('themeButton').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';});
+    el('menuButton').addEventListener('click',event=>{event.preventDefault();document.body.classList.toggle('nav-open');const open=document.body.classList.contains('nav-open');el('mobileBackdrop').hidden=!open;el('menuButton').setAttribute('aria-expanded',String(open));});
+    el('mobileBackdrop').addEventListener('click',()=>{document.body.classList.remove('nav-open');el('mobileBackdrop').hidden=true;});
+    el('globalSearch').addEventListener('keydown',event=>{if(event.key==='Enter'){const query=event.target.value.toLowerCase();const match=Object.entries(NAV_ITEMS).find(([,item])=>item[0].toLowerCase().includes(query));if(match){location.hash=match[1][2];toast(`Opened ${match[1][0]}.`);}else toast('No dashboard destination found.');}});
+    document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();el('globalSearch').focus();}if(event.key==='Escape'){el('personaMenu').hidden=true;}});
+
+    renderDashboard();
+    if (!state.onboarded) requestAnimationFrame(openPersonaDialog);
+  </script>
+</body>
+</html>
